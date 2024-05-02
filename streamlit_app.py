@@ -133,24 +133,18 @@ def display_dashboard():
     upload_button = st.button("Upload to S3", disabled=not (file1 and file2))
 
     if upload_button:
-        progress_bar = st.progress(0)
         df1 = read_csv_with_error_handling(file1) if file1.name.endswith('.csv') else pd.read_excel(file1)
         df2 = read_csv_with_error_handling(file2) if file2.name.endswith('.csv') else pd.read_excel(file2)
-        progress_bar = st.progress(25)
         # Load credentials from Streamlit secrets
         bucket_name = st.secrets["bucket_name"]
         object_name1 = st.secrets["object_name1"]
         object_name2 = st.secrets["object_name2"]
         aws_access_key = st.secrets["aws_access_key"]
         aws_secret_key = st.secrets["aws_secret_key"]
-        progress_bar = st.progress(50)
         # Display a progress bar
         
         success1, message1 = upload_df_to_s3(df1, bucket_name, object_name1, aws_access_key, aws_secret_key)
-        progress_bar.progress(75)
-        
         success2, message2 = upload_df_to_s3(df2, bucket_name, object_name2, aws_access_key, aws_secret_key)
-        progress_bar.progress(100)
 
         # Check upload status
         if success1 and success2:
