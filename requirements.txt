@@ -5,3 +5,4 @@ st-files-connection
 matplotlib
 streamlit-echarts
 openpyxl
+boto3
