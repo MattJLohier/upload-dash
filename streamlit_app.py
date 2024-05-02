@@ -133,35 +133,29 @@ def display_dashboard():
     upload_button = st.button("Upload to S3", disabled=not (file1 and file2))
 
     if upload_button:
-        df1 = read_csv_with_error_handling(file1) if file1.name.endswith('.csv') else pd.read_excel(file1)
-        df2 = read_csv_with_error_handling(file2) if file2.name.endswith('.csv') else pd.read_excel(file2)
-        
-        # Load credentials from Streamlit secrets
-        bucket_name = st.secrets["bucket_name"]
-        object_name1 = st.secrets["object_name1"]
-        object_name2 = st.secrets["object_name2"]
-        aws_access_key = st.secrets["aws_access_key"]
-        aws_secret_key = st.secrets["aws_secret_key"]
+        with st.spinner('Uploading data...'):
+            df1 = read_csv_with_error_handling(file1) if file1.name.endswith('.csv') else pd.read_excel(file1)
+            df2 = read_csv_with_error_handling(file2) if file2.name.endswith('.csv') else pd.read_excel(file2)
+            
+            # Load credentials from Streamlit secrets
+            bucket_name = st.secrets["bucket_name"]
+            object_name1 = st.secrets["object_name1"]
+            object_name2 = st.secrets["object_name2"]
+            aws_access_key = st.secrets["aws_access_key"]
+            aws_secret_key = st.secrets["aws_secret_key"]
 
-        # Initialize the progress bar
-        progress = st.progress(0)
-        total_steps = 2
+            # Upload first file
+            success1, message1 = upload_df_to_s3(df1, bucket_name, object_name1, aws_access_key, aws_secret_key)
+            # Upload second file
+            success2, message2 = upload_df_to_s3(df2, bucket_name, object_name2, aws_access_key, aws_secret_key)
 
-        # Upload first file and update progress
-        success1, message1 = upload_df_to_s3(df1, bucket_name, object_name1, aws_access_key, aws_secret_key)
-        progress.progress(1 / total_steps)
-
-        # Upload second file and update progress
-        success2, message2 = upload_df_to_s3(df2, bucket_name, object_name2, aws_access_key, aws_secret_key)
-        progress.progress(2 / total_steps)
-
-        # Check upload status
-        if success1 and success2:
-            st.success("Both files were successfully uploaded to S3!")
-        else:
-            st.error("One or both files failed to upload. Check the error messages above.")
-            st.write(message1)
-            st.write(message2)
+            # Check upload status
+            if success1 and success2:
+                st.success("Both files were successfully uploaded to S3!")
+            else:
+                st.error("One or both files failed to upload. Check the error messages above.")
+                st.write(message1)
+                st.write(message2)
 
 
 
