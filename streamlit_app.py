@@ -22,7 +22,7 @@ image = Image.open(BytesIO(response.content))
 
 # Set the Streamlit page configuration with the custom icon
 st.set_page_config(
-    page_title="Scooper Dashboard",
+    page_title="Upload",
     page_icon=image,
     layout="wide",
     initial_sidebar_state="expanded"
@@ -143,7 +143,11 @@ def display_dashboard():
         with st.spinner('Uploading data...'):
             df1 = read_csv_with_error_handling(file1) if file1.name.endswith('.csv') else pd.read_excel(file1)
             df2 = read_csv_with_error_handling(file2) if file2.name.endswith('.csv') else pd.read_excel(file2)
-            
+                
+
+
+
+
             # Load credentials from Streamlit secrets
             bucket_name = st.secrets["bucket_name"]
             object_name1 = st.secrets["object_name1"]
