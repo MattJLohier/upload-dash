@@ -129,10 +129,17 @@ def display_dashboard():
     file1 = st.file_uploader("Upload the first file", type=["csv", "xlsx"])
     file2 = st.file_uploader("Upload the second file", type=["csv", "xlsx"])
 
+    # To manage the spinner state
+    is_loading = st.session_state.get('is_loading', False)
+
     # Button for uploading to S3
-    upload_button = st.button("Upload to S3", disabled=not (file1 and file2))
+    if not is_loading:
+        upload_button = st.button("Upload to S3", disabled=not (file1 and file2))
+    else:
+        upload_button = False
 
     if upload_button:
+        st.session_state['is_loading'] = True
         with st.spinner('Uploading data...'):
             df1 = read_csv_with_error_handling(file1) if file1.name.endswith('.csv') else pd.read_excel(file1)
             df2 = read_csv_with_error_handling(file2) if file2.name.endswith('.csv') else pd.read_excel(file2)
@@ -156,7 +163,9 @@ def display_dashboard():
                 st.error("One or both files failed to upload. Check the error messages above.")
                 st.write(message1)
                 st.write(message2)
-
+        
+        # Set the spinner state back to False
+        st.session_state['is_loading'] = False
 
 
 
