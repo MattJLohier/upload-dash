@@ -137,6 +137,7 @@ def page1():
     sidebar()
 
 
+# Function to upload DataFrame to S3
 def upload_df_to_s3(df, bucket_name, object_name, aws_access_key, aws_secret_key):
     s3 = boto3.client(
         's3',
@@ -147,11 +148,19 @@ def upload_df_to_s3(df, bucket_name, object_name, aws_access_key, aws_secret_key
     try:
         s3.put_object(Bucket=bucket_name, Key=object_name, Body=csv_buffer)
         return f"Successfully uploaded {object_name} to {bucket_name}"
-    except (NoCredentialsError, PartialCredentialsError):
-        return "AWS credentials are not correct. Check your access and secret keys."
+    except Exception as e:
+        return f"Error uploading to S3: {str(e)}"
 
+# Function to handle CSV files
+def read_csv_with_error_handling(file):
+    try:
+        return pd.read_csv(file, error_bad_lines=False, warn_bad_lines=True)
+    except Exception as e:
+        st.error(f"Error reading CSV file: {str(e)}")
+        return None
+
+# Streamlit dashboard
 def display_dashboard():
-    # Streamlit app
     st.title("Upload DataFrames to S3")
 
     # File upload boxes
@@ -162,23 +171,22 @@ def display_dashboard():
     upload_button = st.button("Upload to S3", disabled=not (file1 and file2))
 
     if upload_button:
-        # Convert files to dataframes
-        df1 = pd.read_csv(file1) if file1.name.endswith('.csv') else pd.read_excel(file1)
-        df2 = pd.read_csv(file2) if file2.name.endswith('.csv') else pd.read_excel(file2)
+        df1 = read_csv_with_error_handling(file1) if file1.name.endswith('.csv') else pd.read_excel(file1)
+        df2 = read_csv_with_error_handling(file2) if file2.name.endswith('.csv') else pd.read_excel(file2)
 
-        # AWS S3 details (you need to provide these)
-        bucket_name = st.text_input("Enter your S3 bucket name")
-        object_name1 = st.text_input("Enter the name for the first file in the S3 bucket")
-        object_name2 = st.text_input("Enter the name for the second file in the S3 bucket")
-        aws_access_key = st.text_input("Enter your AWS Access Key", type='password')
-        aws_secret_key = st.text_input("Enter your AWS Secret Key", type='password')
+        # Load credentials from Streamlit secrets
+        bucket_name = st.secrets["bucket_name"]
+        object_name1 = st.secrets["object_name1"]
+        object_name2 = st.secrets["object_name2"]
+        aws_access_key = st.secrets["aws_access_key"]
+        aws_secret_key = st.secrets["aws_secret_key"]
 
-        if st.button("Upload Now"):
-            # Upload DataFrames to S3
-            message1 = upload_df_to_s3(df1, bucket_name, object_name1, aws_access_key, aws_secret_key)
-            message2 = upload_df_to_s3(df2, bucket_name, object_name2, aws_access_key, aws_secret_key)
-            st.write(message1)
-            st.write(message2)
+        # Upload DataFrames to S3
+        message1 = upload_df_to_s3(df1, bucket_name, object_name1, aws_access_key, aws_secret_key)
+        message2 = upload_df_to_s3(df2, bucket_name, object_name2, aws_access_key, aws_secret_key)
+        st.write(message1)
+        st.write(message2)
+
 
 
 
