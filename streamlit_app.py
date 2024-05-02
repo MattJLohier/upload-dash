@@ -28,43 +28,6 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-def display_dashboard():
-    alt.themes.enable("dark")
-    st.markdown("<h1 style='text-align: left;'><span style='color: #317bd4;'>Scooper</span> Dashboard</h1>", unsafe_allow_html=True)
-    st.markdown('**Welcome to Scooper Dashboard**')
-    st.info('Scooper is a Python tool hosted on AWS (Lambda/S3/EC2) that uses Selenium and Pandas to scrape new product certifications and placements from official manufacturer websites.') 
-    #st.markdown("---")
-    st.subheader("Directory")
-    st.markdown("""
-    ##### Imaging Equipment 🖨️ #####
-    - Printers, Multifunction Devices, Scanners, Digital Duplicators 
-    ##### Computers 💻 #####
-    - Laptops, Notebooks, Desktops, Tablets, Workstations
-    ##### Televisions 📺 #####
-    - Televisions & Set Top Boxes
-    ##### Telephones ☎️ #####
-    ##### Fridges 🧊 #####
-    ##### Dishwashers 🧼 #####
-    ##### Electric Cookware 🍳 #####
-    ##### Displays 🖥️ #####
-    ##### Audio/Video 🎙️ #####
-    ##### Enterprise Servers 🌐 #####
-    """)
-    st.markdown("---")
-    st.caption('Created by Matt Lohier') 
-    with st.container():
-        st.write("")  # Optional: Use st.empty() if you prefer no filler text at all
-        linkedin_url = "https://www.linkedin.com/in/matt-lohier/"  # Change this URL to your specific LinkedIn profile or page
-        personal_website_url = "https://matt-lohier.com/"  # Change this to your personal website URL
-        st.markdown(f"""
-        <a href="{linkedin_url}" target="_blank" style='display: inline-block; padding-right: 10px;'>
-            <img src='https://cdn-icons-png.flaticon.com/512/174/174857.png' style='width:32px; height:32px;'>
-        </a><!--
-        --><a href="{personal_website_url}" target="_blank" style='display: inline-block;'>
-            <img src='https://i.postimg.cc/9MbrTWL9/portfolio.png' style='width:32px; height:32px;'>
-        </a>
-        """, unsafe_allow_html=True)
-        st.markdown('---')
 
 
 def sidebar():
@@ -147,9 +110,9 @@ def upload_df_to_s3(df, bucket_name, object_name, aws_access_key, aws_secret_key
     csv_buffer = df.to_csv(index=False)
     try:
         s3.put_object(Bucket=bucket_name, Key=object_name, Body=csv_buffer)
-        return f"Successfully uploaded {object_name} to {bucket_name}"
+        return True, f"Successfully uploaded {object_name} to {bucket_name}"
     except Exception as e:
-        return f"Error uploading to S3: {str(e)}"
+        return False, f"Error uploading to S3: {str(e)}"
 
 # Function to handle CSV files
 def read_csv_with_error_handling(file):
@@ -181,11 +144,22 @@ def display_dashboard():
         aws_access_key = st.secrets["aws_access_key"]
         aws_secret_key = st.secrets["aws_secret_key"]
 
-        # Upload DataFrames to S3
-        message1 = upload_df_to_s3(df1, bucket_name, object_name1, aws_access_key, aws_secret_key)
-        message2 = upload_df_to_s3(df2, bucket_name, object_name2, aws_access_key, aws_secret_key)
-        st.write(message1)
-        st.write(message2)
+        # Display a progress bar
+        progress_bar = st.progress(0)
+        
+        success1, message1 = upload_df_to_s3(df1, bucket_name, object_name1, aws_access_key, aws_secret_key)
+        progress_bar.progress(50)
+        
+        success2, message2 = upload_df_to_s3(df2, bucket_name, object_name2, aws_access_key, aws_secret_key)
+        progress_bar.progress(100)
+
+        # Check upload status
+        if success1 and success2:
+            st.success("Both files were successfully uploaded to S3!")
+        else:
+            st.error("One or both files failed to upload. Check the error messages above.")
+            st.write(message1)
+            st.write(message2)
 
 
 
