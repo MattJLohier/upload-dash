@@ -121,9 +121,57 @@ def read_csv_with_error_handling(file):
         st.error(f"Error reading CSV file: {str(e)}")
         return None
 
+
+# Fullscreen overlay HTML and CSS
+overlay_html = """
+<div id="overlay">
+    <div class="spinner"></div>
+    <h2>Loading...</h2>
+</div>
+<style>
+#overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    z-index: 9999;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    color: white;
+}
+.spinner {
+    border: 16px solid #f3f3f3;
+    border-top: 16px solid #3498db;
+    border-radius: 50%;
+    width: 120px;
+    height: 120px;
+    animation: spin 2s linear infinite;
+}
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+</style>
+<script>
+function showOverlay() {
+    document.getElementById("overlay").style.display = "flex";
+}
+function hideOverlay() {
+    document.getElementById("overlay").style.display = "none";
+}
+</script>
+"""
+
+
 # Streamlit dashboard
 def display_dashboard():
     st.title("Upload DataFrames to S3")
+    
+    st.markdown(overlay_html, unsafe_allow_html=True)
 
     # File upload boxes
     file1 = st.file_uploader("Upload the first file", type=["csv", "xlsx"])
@@ -133,29 +181,32 @@ def display_dashboard():
     upload_button = st.button("Upload to S3", disabled=not (file1 and file2))
 
     if upload_button:
-        with st.spinner('Uploading data...'):
-            df1 = read_csv_with_error_handling(file1) if file1.name.endswith('.csv') else pd.read_excel(file1)
-            df2 = read_csv_with_error_handling(file2) if file2.name.endswith('.csv') else pd.read_excel(file2)
-            
-            # Load credentials from Streamlit secrets
-            bucket_name = st.secrets["bucket_name"]
-            object_name1 = st.secrets["object_name1"]
-            object_name2 = st.secrets["object_name2"]
-            aws_access_key = st.secrets["aws_access_key"]
-            aws_secret_key = st.secrets["aws_secret_key"]
+        st.markdown("<script>showOverlay()</script>", unsafe_allow_html=True)
+        
+        df1 = read_csv_with_error_handling(file1) if file1.name.endswith('.csv') else pd.read_excel(file1)
+        df2 = read_csv_with_error_handling(file2) if file2.name.endswith('.csv') else pd.read_excel(file2)
+        
+        # Load credentials from Streamlit secrets
+        bucket_name = st.secrets["bucket_name"]
+        object_name1 = st.secrets["object_name1"]
+        object_name2 = st.secrets["object_name2"]
+        aws_access_key = st.secrets["aws_access_key"]
+        aws_secret_key = st.secrets["aws_secret_key"]
 
-            # Upload first file
-            success1, message1 = upload_df_to_s3(df1, bucket_name, object_name1, aws_access_key, aws_secret_key)
-            # Upload second file
-            success2, message2 = upload_df_to_s3(df2, bucket_name, object_name2, aws_access_key, aws_secret_key)
+        # Upload first file
+        success1, message1 = upload_df_to_s3(df1, bucket_name, object_name1, aws_access_key, aws_secret_key)
+        # Upload second file
+        success2, message2 = upload_df_to_s3(df2, bucket_name, object_name2, aws_access_key, aws_secret_key)
 
-            # Check upload status
-            if success1 and success2:
-                st.success("Both files were successfully uploaded to S3!")
-            else:
-                st.error("One or both files failed to upload. Check the error messages above.")
-                st.write(message1)
-                st.write(message2)
+        # Check upload status
+        if success1 and success2:
+            st.success("Both files were successfully uploaded to S3!")
+        else:
+            st.error("One or both files failed to upload. Check the error messages above.")
+            st.write(message1)
+            st.write(message2)
+        
+        st.markdown("<script>hideOverlay()</script>", unsafe_allow_html=True)
 
 
 
