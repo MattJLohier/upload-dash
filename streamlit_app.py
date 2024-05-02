@@ -137,5 +137,5 @@ def page1():
     sidebar()
 
 
-def_display_dashboard():
+def display_dashboard():
     st.write("These Nuts")
