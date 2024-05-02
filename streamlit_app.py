@@ -29,7 +29,6 @@ st.set_page_config(
 )
 
 
-
 def sidebar():
     st.sidebar.image("https://i.postimg.cc/XJdg0y7b/scooper-logo.png", use_column_width=True)
     st.sidebar.markdown("---")
@@ -100,24 +99,16 @@ def page1():
     sidebar()
 
 
-def upload_df_to_s3(df, bucket_name, object_name, aws_access_key, aws_secret_key, progress_bar):
+# Function to upload DataFrame to S3
+def upload_df_to_s3(df, bucket_name, object_name, aws_access_key, aws_secret_key):
     s3 = boto3.client(
         's3',
         aws_access_key_id=aws_access_key,
         aws_secret_access_key=aws_secret_key
     )
     csv_buffer = df.to_csv(index=False)
-    total_steps = 100
     try:
-        # Simulate gradual progress
-        for progress in range(1, total_steps + 1):
-            time.sleep(0.03)  # Simulate time-consuming work
-            progress_bar.progress(progress / total_steps)
-            
-            # The real upload happens at the last step
-            if progress == total_steps:
-                s3.put_object(Bucket=bucket_name, Key=object_name, Body=csv_buffer)
-
+        s3.put_object(Bucket=bucket_name, Key=object_name, Body=csv_buffer)
         return True, f"Successfully uploaded {object_name} to {bucket_name}"
     except Exception as e:
         return False, f"Error uploading to S3: {str(e)}"
@@ -152,14 +143,14 @@ def display_dashboard():
         aws_access_key = st.secrets["aws_access_key"]
         aws_secret_key = st.secrets["aws_secret_key"]
 
-        # Display progress bars
-        st.write("Uploading the first file...")
-        progress_bar1 = st.progress(0)
-        success1, message1 = upload_df_to_s3(df1, bucket_name, object_name1, aws_access_key, aws_secret_key, progress_bar1)
-
-        st.write("Uploading the second file...")
-        progress_bar2 = st.progress(0)
-        success2, message2 = upload_df_to_s3(df2, bucket_name, object_name2, aws_access_key, aws_secret_key, progress_bar2)
+        # Display a progress bar
+        progress_bar = st.progress(0)
+        
+        success1, message1 = upload_df_to_s3(df1, bucket_name, object_name1, aws_access_key, aws_secret_key)
+        progress_bar.progress(50)
+        
+        success2, message2 = upload_df_to_s3(df2, bucket_name, object_name2, aws_access_key, aws_secret_key)
+        progress_bar.progress(100)
 
         # Check upload status
         if success1 and success2:
