@@ -139,3 +139,7 @@ def page1():
 
 def display_dashboard():
     st.write("These Nuts")
+
+
+if __name__ == "__main__":
+    main()
