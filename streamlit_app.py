@@ -11,6 +11,7 @@ import requests
 import matplotlib.pyplot as plt
 from streamlit_echarts import st_echarts
 import pytz
+import openpyxl
 
 # URL of the image you want to use as the page icon
 icon_url = "https://i.postimg.cc/Y0XLcpg7/scooper-s.png"
