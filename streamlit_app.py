@@ -101,8 +101,7 @@ def page1():
     sidebar()
 
 
-
-# Function to upload a file to S3
+# Optimized function to upload file to S3
 def upload_file_to_s3(file_content, bucket_name, object_name, aws_access_key, aws_secret_key):
     s3 = boto3.client(
         's3',
@@ -110,23 +109,18 @@ def upload_file_to_s3(file_content, bucket_name, object_name, aws_access_key, aw
         aws_secret_access_key=aws_secret_key
     )
     try:
-        s3.put_object(Bucket=bucket_name, Key=object_name, Body=file_content)
+        # Upload using put_object or multipart
+        s3.upload_fileobj(io.BytesIO(file_content), bucket_name, object_name)
         return True, f"Successfully uploaded {object_name} to {bucket_name}"
     except Exception as e:
         return False, f"Error uploading to S3: {str(e)}"
 
 def merge_in_chunks(file_pivot, file_report, output_file, progress=None, chunk_size=10000):
-    df_report = pd.read_excel(file_report, sheet_name="Product Details", header=5)
+    df_report = pd.read_excel(file_report, sheet_name="Product Details", header=5, usecols=["Product", ...])
     df_report.set_index("Product", inplace=True)
 
-    temp_csv = io.StringIO()
-    df_pivot_table = pd.read_excel(file_pivot, sheet_name="Product & Pricing Pivot Data", header=3)
-    df_pivot_table.to_csv(temp_csv, index=False)
-    temp_csv.seek(0)
-
-    total_chunks = sum(1 for _ in pd.read_csv(temp_csv, chunksize=chunk_size))
-    temp_csv.seek(0)
-
+    temp_csv = pd.read_excel(file_pivot, sheet_name="Product & Pricing Pivot Data", header=3)
+    
     with pd.ExcelWriter(output_file, engine='xlsxwriter') as writer:
         for i, chunk in enumerate(pd.read_csv(temp_csv, chunksize=chunk_size)):
             chunk.set_index("Product", inplace=True)
@@ -180,8 +174,6 @@ def display_dashboard():
                 st.write(message)
         
         st.session_state['is_loading'] = False
-
-
 
 
 if __name__ == "__main__":
