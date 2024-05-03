@@ -12,7 +12,7 @@ import requests
 import pytz
 import openpyxl
 import boto3
-
+import 
 
 # URL of the image you want to use as the page icon
 icon_url = "https://i.postimg.cc/Y0XLcpg7/scooper-s.png"
@@ -150,7 +150,7 @@ def display_dashboard():
 
             # Save merged dataframe to an in-memory Excel file
             output = io.BytesIO()
-            with pd.ExcelWriter(output, engine='openpyxl') as writer:
+            with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
                 merged_df.to_excel(writer, index=False, sheet_name="Merged Data")
             output.seek(0)
 
