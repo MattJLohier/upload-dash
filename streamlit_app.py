@@ -115,40 +115,37 @@ def upload_file_to_s3(file_content, bucket_name, object_name, aws_access_key, aw
     except Exception as e:
         return False, f"Error uploading to S3: {str(e)}"
 
-# Function to merge data in chunks
-def merge_in_chunks(file_pivot, file_report, output_file, chunk_size=10000):
-    # Load the smaller dataframe entirely with specified dtypes
+def merge_in_chunks(file_pivot, file_report, output_file, progress=None, chunk_size=10000):
     df_report = pd.read_excel(file_report, sheet_name="Product Details", header=5)
     df_report.set_index("Product", inplace=True)
 
-    # Convert the larger Excel file to a CSV file
     temp_csv = io.StringIO()
     df_pivot_table = pd.read_excel(file_pivot, sheet_name="Product & Pricing Pivot Data", header=3)
     df_pivot_table.to_csv(temp_csv, index=False)
+    temp_csv.seek(0)
+
+    total_chunks = sum(1 for _ in pd.read_csv(temp_csv, chunksize=chunk_size))
     temp_csv.seek(0)
 
     with pd.ExcelWriter(output_file, engine='xlsxwriter') as writer:
         for i, chunk in enumerate(pd.read_csv(temp_csv, chunksize=chunk_size)):
             chunk.set_index("Product", inplace=True)
             merged_chunk = chunk.join(df_report, how='inner', lsuffix='_pivot', rsuffix='_report')
-            
-            # Write chunk to Excel file
             merged_chunk.reset_index(inplace=True)
             startrow = i * chunk_size
             merged_chunk.to_excel(writer, index=False, startrow=startrow, header=(i == 0))
 
-# Streamlit dashboard
+            if progress:
+                progress.progress((i + 1) / total_chunks)
+
 def display_dashboard():
     st.title("Upload Excel Files to S3")
 
-    # File upload boxes (only accepting Excel files)
     file1 = st.file_uploader("Upload the first Excel file", type=["xlsx"])
     file2 = st.file_uploader("Upload the second Excel file", type=["xlsx"])
 
-    # To manage the spinner state
     is_loading = st.session_state.get('is_loading', False)
 
-    # Button for uploading to S3
     if not is_loading:
         upload_button = st.button("Process and Upload to S3", disabled=not (file1 and file2))
     else:
@@ -156,19 +153,16 @@ def display_dashboard():
 
     if upload_button:
         st.session_state['is_loading'] = True
+
+        progress = st.progress(0)
+
         with st.spinner('Processing data...'):
-            # Identify which file contains "PivotTable" in its name
             file_pivot = file1 if "PivotTable" in file1.name else file2
             file_report = file1 if file_pivot != file1 else file2
 
-            # Merge the dataframes in chunks
-            merged_df = merge_in_chunks(file_pivot, file_report)
-           
-            # Convert the merged DataFrame to an Excel file in memory
             output = io.BytesIO()
-            merge_in_chunks(file_pivot, file_report, output)
+            merge_in_chunks(file_pivot, file_report, output, progress)
 
-            # Load credentials from Streamlit secrets
             bucket_name = st.secrets["bucket_name"]
             merged_object_name = "Merged_Data.xlsx"
             aws_access_key = st.secrets["aws_access_key"]
@@ -176,7 +170,6 @@ def display_dashboard():
             
             st.write("Uploading Combined Data")
             
-            # Upload the merged file
             output.seek(0)
             success, message = upload_file_to_s3(output.getvalue(), bucket_name, merged_object_name, aws_access_key, aws_secret_key)
 
@@ -187,6 +180,7 @@ def display_dashboard():
                 st.write(message)
         
         st.session_state['is_loading'] = False
+
 
 
 
