@@ -177,8 +177,7 @@ def display_dashboard():
             merged_object_name = "Merged_Data.xlsx"
             aws_access_key = st.secrets["aws_access_key"]
             aws_secret_key = st.secrets["aws_secret_key"]
-            warnings.filterwarnings("ignore", category=UserWarning, module="streamlit")
-
+            
             st.write("Uploading Combined Data")
             
             # Upload the merged file
