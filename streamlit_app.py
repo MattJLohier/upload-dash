@@ -99,6 +99,7 @@ def page1():
     sidebar()
 
 
+
 # Function to upload a file to S3
 def upload_file_to_s3(file_content, bucket_name, object_name, aws_access_key, aws_secret_key):
     s3 = boto3.client(
@@ -130,7 +131,7 @@ def merge_in_chunks(file_pivot, file_report, chunk_size=10000):
     # Process the CSV in chunks
     for chunk in pd.read_csv(temp_csv, chunksize=chunk_size):
         chunk.set_index("Product", inplace=True)
-        merged_chunk = chunk.join(df_report, how='inner')  # Use appropriate join type
+        merged_chunk = chunk.join(df_report, how='inner', lsuffix='_pivot', rsuffix='_report')
         
         result_df = pd.concat([result_df, merged_chunk])
     
