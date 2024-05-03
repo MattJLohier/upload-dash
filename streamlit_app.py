@@ -137,12 +137,10 @@ def display_dashboard():
             file_report = file1 if file_pivot != file1 else file2
 
             # Load the pivot table data and remove the first 3 rows
-            df_pivot_table = pd.read_excel(file_pivot, sheet_name="Product & Pricing Pivot Data")
-            df_pivot_table = df_pivot_table.iloc[3:]  # Remove first 3 rows
+            df_pivot_table = pd.read_excel(file_pivot, sheet_name="Product & Pricing Pivot Data", header=3)
 
             # Load the report data and remove the first 5 rows
-            df_report = pd.read_excel(file_report, sheet_name="Product Details")
-            df_report = df_report.iloc[5:]  # Remove first 5 rows
+            df_report = pd.read_excel(file_report, sheet_name="Product Details", header=5)
 
             st.write(df_report)
             st.write(df_pivot_table)
