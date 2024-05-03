@@ -146,19 +146,20 @@ def display_dashboard():
             st.write(df_pivot_table)
             # Merge the dataframes on the 'Product' column
             merged_df = pd.merge(df_pivot_table, df_report, on="Product")
-            st.write(merged_df)
-            # Save merged dataframe to an in-memory Excel file
+            
+            # Convert the merged DataFrame to an Excel file in memory
             output = io.BytesIO()
             with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
-                merged_df.to_excel(writer, index=False, sheet_name="Merged Data")
-            output.seek(0)
+                merged_df.to_excel(writer, index=False)
+
+            st.write(merged_df)
 
             # Load credentials from Streamlit secrets
             bucket_name = st.secrets["bucket_name"]
             merged_object_name = "Merged_Data.xlsx"
             aws_access_key = st.secrets["aws_access_key"]
             aws_secret_key = st.secrets["aws_secret_key"]
-
+            st.write("Uploading Combined Data")
             # Upload the merged file
             success, message = upload_file_to_s3(output.read(), bucket_name, merged_object_name, aws_access_key, aws_secret_key)
 
