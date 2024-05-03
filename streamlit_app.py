@@ -117,21 +117,21 @@ def upload_file_to_s3(file_content, bucket_name, object_name, aws_access_key, aw
 
 # Function to merge data in chunks
 def merge_in_chunks(file_pivot, file_report, output_file, chunk_size=10000):
-    # Load the smaller dataframe entirely, specifying column data types
-    df_report = pd.read_excel(file_report, sheet_name="Product Details", header=5, dtype={'Product': str})
+    # Load the smaller dataframe entirely with specified dtypes
+    df_report = pd.read_excel(file_report, sheet_name="Product Details", header=5)
     df_report.set_index("Product", inplace=True)
 
-    # Convert the larger Excel file to a CSV file, use only required columns and use memory mapping
+    # Convert the larger Excel file to a CSV file
     temp_csv = io.StringIO()
-    df_pivot_table = pd.read_excel(file_pivot, sheet_name="Product & Pricing Pivot Data", header=3, dtype={'Product': str}, usecols=['Product', 'OtherColumns'], engine='openpyxl', mmap=True)
+    df_pivot_table = pd.read_excel(file_pivot, sheet_name="Product & Pricing Pivot Data", header=3)
     df_pivot_table.to_csv(temp_csv, index=False)
     temp_csv.seek(0)
 
     with pd.ExcelWriter(output_file, engine='xlsxwriter') as writer:
-        for i, chunk in enumerate(pd.read_csv(temp_csv, chunksize=chunk_size, dtype={'Product': str})):
+        for i, chunk in enumerate(pd.read_csv(temp_csv, chunksize=chunk_size)):
             chunk.set_index("Product", inplace=True)
             merged_chunk = chunk.join(df_report, how='inner', lsuffix='_pivot', rsuffix='_report')
-
+            
             # Write chunk to Excel file
             merged_chunk.reset_index(inplace=True)
             startrow = i * chunk_size
