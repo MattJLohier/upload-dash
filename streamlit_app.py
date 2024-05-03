@@ -6,6 +6,7 @@ import altair as alt
 from st_files_connection import FilesConnection
 import hashlib
 from io import BytesIO
+import io
 from PIL import Image
 import requests
 import pytz
