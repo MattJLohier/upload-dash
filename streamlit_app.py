@@ -13,7 +13,7 @@ import pytz
 import openpyxl
 import boto3
 import warnings
-st.set_option('client.showErrorDetails', False)
+#st.set_option('client.showErrorDetails', False)
 
 
 # URL of the image you want to use as the page icon
