@@ -99,35 +99,38 @@ def page1():
     sidebar()
 
 
-# Function to upload DataFrame to S3
+# Function to upload DataFrame to S3 as an Excel file
 def upload_df_to_s3(df, bucket_name, object_name, aws_access_key, aws_secret_key):
     s3 = boto3.client(
         's3',
         aws_access_key_id=aws_access_key,
         aws_secret_access_key=aws_secret_key
     )
-    csv_buffer = df.to_csv(index=False)
+    # Convert DataFrame to Excel file in memory
+    excel_buffer = BytesIO()
+    with pd.ExcelWriter(excel_buffer, engine='xlsxwriter') as writer:
+        df.to_excel(writer, index=False)
     try:
-        s3.put_object(Bucket=bucket_name, Key=object_name, Body=csv_buffer)
+        s3.put_object(Bucket=bucket_name, Key=object_name, Body=excel_buffer.getvalue())
         return True, f"Successfully uploaded {object_name} to {bucket_name}"
     except Exception as e:
         return False, f"Error uploading to S3: {str(e)}"
 
-# Function to handle CSV files
-def read_csv_with_error_handling(file):
+# Function to read Excel files with error handling
+def read_excel_with_error_handling(file):
     try:
-        return pd.read_csv(file, error_bad_lines=False, warn_bad_lines=True)
+        return pd.read_excel(file)
     except Exception as e:
-        st.error(f"Error reading CSV file: {str(e)}")
+        st.error(f"Error reading Excel file: {str(e)}")
         return None
 
 # Streamlit dashboard
 def display_dashboard():
     st.title("Upload DataFrames to S3")
 
-    # File upload boxes
-    file1 = st.file_uploader("Upload the first file", type=["csv", "xlsx"])
-    file2 = st.file_uploader("Upload the second file", type=["csv", "xlsx"])
+    # File upload boxes (only accepting Excel files)
+    file1 = st.file_uploader("Upload the first Excel file", type=["xlsx"])
+    file2 = st.file_uploader("Upload the second Excel file", type=["xlsx"])
 
     # To manage the spinner state
     is_loading = st.session_state.get('is_loading', False)
@@ -141,12 +144,8 @@ def display_dashboard():
     if upload_button:
         st.session_state['is_loading'] = True
         with st.spinner('Uploading data...'):
-            df1 = read_csv_with_error_handling(file1) if file1.name.endswith('.csv') else pd.read_excel(file1)
-            df2 = read_csv_with_error_handling(file2) if file2.name.endswith('.csv') else pd.read_excel(file2)
-                
-
-
-
+            df1 = read_excel_with_error_handling(file1)
+            df2 = read_excel_with_error_handling(file2)
 
             # Load credentials from Streamlit secrets
             bucket_name = st.secrets["bucket_name"]
