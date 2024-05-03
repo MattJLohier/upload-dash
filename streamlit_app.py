@@ -116,8 +116,8 @@ def upload_file_to_s3(file_content, bucket_name, object_name, aws_access_key, aw
         return False, f"Error uploading to S3: {str(e)}"
 
 # Function to merge data in chunks
-def merge_in_chunks(file_pivot, file_report, chunk_size=10000):
-    # Load the smaller dataframe entirely
+def merge_in_chunks(file_pivot, file_report, output_file, chunk_size=10000):
+    # Load the smaller dataframe entirely with specified dtypes
     df_report = pd.read_excel(file_report, sheet_name="Product Details", header=5)
     df_report.set_index("Product", inplace=True)
 
@@ -126,19 +126,16 @@ def merge_in_chunks(file_pivot, file_report, chunk_size=10000):
     df_pivot_table = pd.read_excel(file_pivot, sheet_name="Product & Pricing Pivot Data", header=3)
     df_pivot_table.to_csv(temp_csv, index=False)
     temp_csv.seek(0)
-    
-    # Initialize an empty dataframe for storing the result
-    result_df = pd.DataFrame()
 
-    # Process the CSV in chunks
-    for chunk in pd.read_csv(temp_csv, chunksize=chunk_size):
-        chunk.set_index("Product", inplace=True)
-        merged_chunk = chunk.join(df_report, how='inner', lsuffix='_pivot', rsuffix='_report')
-        
-        result_df = pd.concat([result_df, merged_chunk])
-    
-    result_df.reset_index(inplace=True)
-    return result_df
+    with pd.ExcelWriter(output_file, engine='xlsxwriter') as writer:
+        for i, chunk in enumerate(pd.read_csv(temp_csv, chunksize=chunk_size)):
+            chunk.set_index("Product", inplace=True)
+            merged_chunk = chunk.join(df_report, how='inner', lsuffix='_pivot', rsuffix='_report')
+            
+            # Write chunk to Excel file
+            merged_chunk.reset_index(inplace=True)
+            startrow = i * chunk_size
+            merged_chunk.to_excel(writer, index=False, startrow=startrow, header=(i == 0))
 
 # Streamlit dashboard
 def display_dashboard():
@@ -169,9 +166,8 @@ def display_dashboard():
            
             # Convert the merged DataFrame to an Excel file in memory
             output = io.BytesIO()
-            with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
-                merged_df.to_excel(writer, index=False)
-            
+            merge_in_chunks(file_pivot, file_report, output)
+
             # Load credentials from Streamlit secrets
             bucket_name = st.secrets["bucket_name"]
             merged_object_name = "Merged_Data.xlsx"
@@ -181,6 +177,7 @@ def display_dashboard():
             st.write("Uploading Combined Data")
             
             # Upload the merged file
+            output.seek(0)
             success, message = upload_file_to_s3(output.getvalue(), bucket_name, merged_object_name, aws_access_key, aws_secret_key)
 
             if success:
