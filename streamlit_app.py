@@ -144,6 +144,8 @@ def display_dashboard():
             df_report = pd.read_excel(file_report, sheet_name="Product Details")
             df_report = df_report.iloc[5:]  # Remove first 5 rows
 
+            st.write(df_report)
+            st.write(df_pivot_table)
             # Merge the dataframes on the 'Product' column
             merged_df = pd.merge(df_pivot_table, df_report, on="Product")
 
