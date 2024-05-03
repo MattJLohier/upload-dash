@@ -117,12 +117,18 @@ def merge_in_chunks(file_pivot, file_report, chunk_size=10000):
     # Load the smaller dataframe entirely
     df_report = pd.read_excel(file_report, sheet_name="Product Details", header=5)
     df_report.set_index("Product", inplace=True)
+
+    # Convert the larger Excel file to a CSV file
+    temp_csv = io.StringIO()
+    df_pivot_table = pd.read_excel(file_pivot, sheet_name="Product & Pricing Pivot Data", header=3)
+    df_pivot_table.to_csv(temp_csv, index=False)
+    temp_csv.seek(0)
     
     # Initialize an empty dataframe for storing the result
     result_df = pd.DataFrame()
 
-    # Process the larger dataframe in chunks
-    for chunk in pd.read_excel(file_pivot, sheet_name="Product & Pricing Pivot Data", header=3, chunksize=chunk_size):
+    # Process the CSV in chunks
+    for chunk in pd.read_csv(temp_csv, chunksize=chunk_size):
         chunk.set_index("Product", inplace=True)
         merged_chunk = chunk.join(df_report, how='inner')  # Use appropriate join type
         
