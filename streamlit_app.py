@@ -146,7 +146,7 @@ def display_dashboard():
             st.write(df_pivot_table)
             # Merge the dataframes on the 'Product' column
             merged_df = pd.merge(df_pivot_table, df_report, on="Product")
-
+            st.write(merged_df)
             # Save merged dataframe to an in-memory Excel file
             output = io.BytesIO()
             with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
