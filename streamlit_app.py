@@ -138,10 +138,12 @@ def display_dashboard():
 
             # Load the pivot table data and remove the first 3 rows
             df_pivot_table = pd.read_excel(file_pivot, sheet_name="Product & Pricing Pivot Data", header=3)
+            df_pivot_table = df_pivot_table.convert_dtypes()
 
             # Load the report data and remove the first 5 rows
             df_report = pd.read_excel(file_report, sheet_name="Product Details", header=5)
-
+            df_report = df_report.convert_dtypes()
+            
             st.write(df_report)
             st.write(df_pivot_table)
             # Merge the dataframes on the 'Product' column
