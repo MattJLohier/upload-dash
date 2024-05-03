@@ -150,7 +150,7 @@ def display_dashboard():
 
             # Save merged dataframe to an in-memory Excel file
             output = io.BytesIO()
-            with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
+            with pd.ExcelWriter(output, engine='openpyxl') as writer:
                 merged_df.to_excel(writer, index=False, sheet_name="Merged Data")
             output.seek(0)
 
