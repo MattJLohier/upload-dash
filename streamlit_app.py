@@ -116,7 +116,7 @@ def upload_file_to_s3(file_content, bucket_name, object_name, aws_access_key, aw
         return False, f"Error uploading to S3: {str(e)}"
 
 def merge_in_chunks(file_pivot, file_report, output_file, progress=None, chunk_size=10000):
-    df_report = pd.read_excel(file_report, sheet_name="Product Details", header=5, usecols=["Product", ...])
+    df_report = pd.read_excel(file_report, sheet_name="Product Details", header=5)
     df_report.set_index("Product", inplace=True)
 
     temp_csv = pd.read_excel(file_pivot, sheet_name="Product & Pricing Pivot Data", header=3)
