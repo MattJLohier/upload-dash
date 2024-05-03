@@ -125,36 +125,45 @@ def display_dashboard():
 
     # Button for uploading to S3
     if not is_loading:
-        upload_button = st.button("Upload to S3", disabled=not (file1 and file2))
+        upload_button = st.button("Process and Upload to S3", disabled=not (file1 and file2))
     else:
         upload_button = False
 
     if upload_button:
         st.session_state['is_loading'] = True
-        with st.spinner('Uploading data...'):
-            # Read the files as binary
-            file1_content = file1.read()
-            file2_content = file2.read()
+        with st.spinner('Processing data...'):
+            # Identify which file contains "PivotTable" in its name
+            file_pivot = file1 if "PivotTable" in file1.name else file2
+            file_report = file1 if file_pivot != file1 else file2
+
+            # Load the pivot table data
+            df_pivot_table = pd.read_excel(file_pivot, sheet_name="Product & Pricing Pivot Data")
+            # Load the report data
+            df_report = pd.read_excel(file_report, sheet_name="Product Details")
+
+            # Merge the dataframes on the 'Product' column
+            merged_df = pd.merge(df_pivot_table, df_report, on="Product")
+
+            # Save merged dataframe to an in-memory Excel file
+            output = io.BytesIO()
+            with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
+                merged_df.to_excel(writer, index=False, sheet_name="Merged Data")
+            output.seek(0)
 
             # Load credentials from Streamlit secrets
             bucket_name = st.secrets["bucket_name"]
-            object_name1 = st.secrets["object_name1"]
-            object_name2 = st.secrets["object_name2"]
+            merged_object_name = "Merged_Data.xlsx"
             aws_access_key = st.secrets["aws_access_key"]
             aws_secret_key = st.secrets["aws_secret_key"]
 
-            # Upload first file
-            success1, message1 = upload_file_to_s3(file1_content, bucket_name, object_name1, aws_access_key, aws_secret_key)
-            # Upload second file
-            success2, message2 = upload_file_to_s3(file2_content, bucket_name, object_name2, aws_access_key, aws_secret_key)
+            # Upload the merged file
+            success, message = upload_file_to_s3(output.read(), bucket_name, merged_object_name, aws_access_key, aws_secret_key)
 
-            # Check upload status
-            if success1 and success2:
-                st.success("Both files were successfully uploaded to S3!")
+            if success:
+                st.success("Merged data file was successfully uploaded to S3!")
             else:
-                st.error("One or both files failed to upload. Check the error messages above.")
-                st.write(message1)
-                st.write(message2)
+                st.error("Failed to upload merged data to S3.")
+                st.write(message)
         
         # Set the spinner state back to False
         st.session_state['is_loading'] = False
