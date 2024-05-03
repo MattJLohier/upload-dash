@@ -99,35 +99,22 @@ def page1():
     sidebar()
 
 
-# Function to upload DataFrame to S3 as an Excel file
-# Function to upload DataFrame to S3 as an Excel file
-def upload_df_to_s3(df, bucket_name, object_name, aws_access_key, aws_secret_key):
+# Function to upload a file to S3
+def upload_file_to_s3(file_content, bucket_name, object_name, aws_access_key, aws_secret_key):
     s3 = boto3.client(
         's3',
         aws_access_key_id=aws_access_key,
         aws_secret_access_key=aws_secret_key
     )
-    # Convert DataFrame to Excel file in memory
-    excel_buffer = BytesIO()
-    with pd.ExcelWriter(excel_buffer, engine='openpyxl') as writer:
-        df.to_excel(writer, index=False)
     try:
-        s3.put_object(Bucket=bucket_name, Key=object_name, Body=excel_buffer.getvalue())
+        s3.put_object(Bucket=bucket_name, Key=object_name, Body=file_content)
         return True, f"Successfully uploaded {object_name} to {bucket_name}"
     except Exception as e:
         return False, f"Error uploading to S3: {str(e)}"
 
-# Function to read Excel files with error handling
-def read_excel_with_error_handling(file):
-    try:
-        return pd.read_excel(file)
-    except Exception as e:
-        st.error(f"Error reading Excel file: {str(e)}")
-        return None
-
 # Streamlit dashboard
 def display_dashboard():
-    st.title("Upload DataFrames to S3")
+    st.title("Upload Excel Files to S3")
 
     # File upload boxes (only accepting Excel files)
     file1 = st.file_uploader("Upload the first Excel file", type=["xlsx"])
@@ -145,8 +132,9 @@ def display_dashboard():
     if upload_button:
         st.session_state['is_loading'] = True
         with st.spinner('Uploading data...'):
-            df1 = read_excel_with_error_handling(file1)
-            df2 = read_excel_with_error_handling(file2)
+            # Read the files as binary
+            file1_content = file1.read()
+            file2_content = file2.read()
 
             # Load credentials from Streamlit secrets
             bucket_name = st.secrets["bucket_name"]
@@ -156,9 +144,9 @@ def display_dashboard():
             aws_secret_key = st.secrets["aws_secret_key"]
 
             # Upload first file
-            success1, message1 = upload_df_to_s3(df1, bucket_name, object_name1, aws_access_key, aws_secret_key)
+            success1, message1 = upload_file_to_s3(file1_content, bucket_name, object_name1, aws_access_key, aws_secret_key)
             # Upload second file
-            success2, message2 = upload_df_to_s3(df2, bucket_name, object_name2, aws_access_key, aws_secret_key)
+            success2, message2 = upload_file_to_s3(file2_content, bucket_name, object_name2, aws_access_key, aws_secret_key)
 
             # Check upload status
             if success1 and success2:
