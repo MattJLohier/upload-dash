@@ -112,6 +112,25 @@ def upload_file_to_s3(file_content, bucket_name, object_name, aws_access_key, aw
     except Exception as e:
         return False, f"Error uploading to S3: {str(e)}"
 
+# Function to merge data in chunks
+def merge_in_chunks(file_pivot, file_report, chunk_size=10000):
+    # Load the smaller dataframe entirely
+    df_report = pd.read_excel(file_report, sheet_name="Product Details", header=5)
+    df_report.set_index("Product", inplace=True)
+    
+    # Initialize an empty dataframe for storing the result
+    result_df = pd.DataFrame()
+
+    # Process the larger dataframe in chunks
+    for chunk in pd.read_excel(file_pivot, sheet_name="Product & Pricing Pivot Data", header=3, chunksize=chunk_size):
+        chunk.set_index("Product", inplace=True)
+        merged_chunk = chunk.join(df_report, how='inner')  # Use appropriate join type
+        
+        result_df = pd.concat([result_df, merged_chunk])
+    
+    result_df.reset_index(inplace=True)
+    return result_df
+
 # Streamlit dashboard
 def display_dashboard():
     st.title("Upload Excel Files to S3")
@@ -136,35 +155,25 @@ def display_dashboard():
             file_pivot = file1 if "PivotTable" in file1.name else file2
             file_report = file1 if file_pivot != file1 else file2
 
-            # Load the pivot table data and remove the first 3 rows
-            df_pivot_table = pd.read_excel(file_pivot, sheet_name="Product & Pricing Pivot Data", header=3)
-            df_pivot_table = df_pivot_table.fillna('').astype(str)  # Handle missing data and ensure consistent types
-
-            # Load the report data and remove the first 5 rows
-            df_report = pd.read_excel(file_report, sheet_name="Product Details", header=5)
-            df_report = df_report.fillna('').astype(str)
-            
-            st.write(df_report)
-            st.write(df_pivot_table)
-            # Merge the dataframes on the 'Product' column
-            merged_df = pd.merge(df_pivot_table, df_report, on="Product")
-            merged_df = merged_df.fillna('').astype(str)
-            
+            # Merge the dataframes in chunks
+            merged_df = merge_in_chunks(file_pivot, file_report)
+            st.write(merged_df)
+           
             # Convert the merged DataFrame to an Excel file in memory
             output = io.BytesIO()
             with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
                 merged_df.to_excel(writer, index=False)
-
-            st.write(merged_df)
-
+            
             # Load credentials from Streamlit secrets
             bucket_name = st.secrets["bucket_name"]
             merged_object_name = "Merged_Data.xlsx"
             aws_access_key = st.secrets["aws_access_key"]
             aws_secret_key = st.secrets["aws_secret_key"]
+
             st.write("Uploading Combined Data")
+            
             # Upload the merged file
-            success, message = upload_file_to_s3(output.read(), bucket_name, merged_object_name, aws_access_key, aws_secret_key)
+            success, message = upload_file_to_s3(output.getvalue(), bucket_name, merged_object_name, aws_access_key, aws_secret_key)
 
             if success:
                 st.success("Merged data file was successfully uploaded to S3!")
@@ -172,7 +181,6 @@ def display_dashboard():
                 st.error("Failed to upload merged data to S3.")
                 st.write(message)
         
-        # Set the spinner state back to False
         st.session_state['is_loading'] = False
 
 
