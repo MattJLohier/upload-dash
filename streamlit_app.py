@@ -100,6 +100,7 @@ def page1():
 
 
 # Function to upload DataFrame to S3 as an Excel file
+# Function to upload DataFrame to S3 as an Excel file
 def upload_df_to_s3(df, bucket_name, object_name, aws_access_key, aws_secret_key):
     s3 = boto3.client(
         's3',
@@ -108,7 +109,7 @@ def upload_df_to_s3(df, bucket_name, object_name, aws_access_key, aws_secret_key
     )
     # Convert DataFrame to Excel file in memory
     excel_buffer = BytesIO()
-    with pd.ExcelWriter(excel_buffer, engine='xlsxwriter') as writer:
+    with pd.ExcelWriter(excel_buffer, engine='openpyxl') as writer:
         df.to_excel(writer, index=False)
     try:
         s3.put_object(Bucket=bucket_name, Key=object_name, Body=excel_buffer.getvalue())
