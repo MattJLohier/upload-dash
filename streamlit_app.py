@@ -166,7 +166,6 @@ def display_dashboard():
 
             # Merge the dataframes in chunks
             merged_df = merge_in_chunks(file_pivot, file_report)
-            st.write(merged_df)
            
             # Convert the merged DataFrame to an Excel file in memory
             output = io.BytesIO()
