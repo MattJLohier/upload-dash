@@ -116,8 +116,13 @@ def upload_file_to_s3(file_content, bucket_name, object_name, aws_access_key, aw
     except Exception as e:
         return False, f"Error uploading to S3: {str(e)}"
 
-def call_lambda_merge(input_bucket, pivot_file_key, report_file_key, output_bucket, output_file_key):
-    lambda_client = boto3.client('lambda', region_name='us-east-2')
+def call_lambda_merge(input_bucket, pivot_file_key, report_file_key, output_bucket, output_file_key, aws_access_key, aws_secret_key):
+    lambda_client = boto3.client(
+        'lambda',
+        region_name='us-east-2',
+        aws_access_key_id=aws_access_key,
+        aws_secret_access_key=aws_secret_key
+    )
     payload = {
         "input_bucket": input_bucket,
         "pivot_file_key": pivot_file_key,
@@ -158,7 +163,15 @@ def display_dashboard():
             upload_file_to_s3(file_report.getvalue(), bucket_name, report_key, aws_access_key, aws_secret_key)
 
             # Call Lambda
-            response = call_lambda_merge(bucket_name, pivot_key, report_key, bucket_name, output_key)
+            response = call_lambda_merge(
+                bucket_name,
+                pivot_key,
+                report_key,
+                bucket_name,
+                output_key,
+                aws_access_key,  # Pass credentials
+                aws_secret_key
+            )
             st.success(f"Lambda function executed: {response['body']}")
 
             # Optionally, you can provide a link to download the merged file or notify that it is available in S3
