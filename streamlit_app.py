@@ -111,8 +111,16 @@ def upload_file_to_s3(file_content, bucket_name, object_name, aws_access_key, aw
         aws_secret_access_key=aws_secret_key
     )
     try:
+        # Upload original file (Excel)
         s3.put_object(Bucket=bucket_name, Key=object_name, Body=file_content)
-        return True, f"Successfully uploaded {object_name} to {bucket_name}"
+        
+        # Convert to CSV
+        df = pd.read_excel(io.BytesIO(file_content))
+        csv_content = df.to_csv(index=False).encode()
+        csv_object_name = object_name.replace('.xlsx', '.csv')
+        s3.put_object(Bucket=bucket_name, Key=csv_object_name, Body=csv_content)
+        
+        return True, f"Successfully uploaded {object_name} and {csv_object_name} to {bucket_name}"
     except Exception as e:
         return False, f"Error uploading to S3: {str(e)}"
 
