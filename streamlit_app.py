@@ -175,7 +175,7 @@ def display_dashboard():
             st.success(f"Lambda function executed: {response['body']}")
 
             # Optionally, you can provide a link to download the merged file or notify that it is available in S3
-            st.markdown(f"**Merged file available in S3:** {bucket_name}/{output_key}")
+            st.markdown("**Merged file available in S3:**")
 
 st.session_state['is_loading'] = False
 
