@@ -105,22 +105,34 @@ def page1():
 
 # Function to upload a file to S3
 def upload_file_to_s3(file_content, bucket_name, object_name, aws_access_key, aws_secret_key):
+    # Define the specific sheets to check
+    target_sheets = ["Product & Pricing Pivot Data", "Product Details"]
+    
     s3 = boto3.client(
         's3',
         aws_access_key_id=aws_access_key,
         aws_secret_access_key=aws_secret_key
     )
+    
     try:
-        # Upload original file (Excel)
+        # Upload the original Excel file
         s3.put_object(Bucket=bucket_name, Key=object_name, Body=file_content)
         
-        # Convert to CSV
-        df = pd.read_excel(io.BytesIO(file_content))
-        csv_content = df.to_csv(index=False).encode()
-        csv_object_name = object_name.replace('.xlsx', '.csv')
-        s3.put_object(Bucket=bucket_name, Key=csv_object_name, Body=csv_content)
+        # Load workbook and check for target sheets
+        workbook = pd.ExcelFile(io.BytesIO(file_content))
+        results = []
+        for sheet_name in workbook.sheet_names:
+            if sheet_name in target_sheets:
+                df = pd.read_excel(workbook, sheet_name=sheet_name)
+                csv_content = df.to_csv(index=False).encode()
+                csv_object_name = object_name.replace('.xlsx', f'_{sheet_name}.csv')
+                s3.put_object(Bucket=bucket_name, Key=csv_object_name, Body=csv_content)
+                results.append(f"Successfully uploaded {csv_object_name}")
+
+        if not results:
+            return False, "None of the target sheets found in the file."
         
-        return True, f"Successfully uploaded {object_name} and {csv_object_name} to {bucket_name}"
+        return True, "Uploaded files: " + ", ".join(results)
     except Exception as e:
         return False, f"Error uploading to S3: {str(e)}"
 
