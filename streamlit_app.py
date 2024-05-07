@@ -116,7 +116,7 @@ def upload_file_to_s3(file_content, bucket_name, object_name, aws_access_key, aw
         return False, f"Error uploading to S3: {str(e)}"
 
 def call_lambda_merge(input_bucket, pivot_file_key, report_file_key, output_bucket, output_file_key):
-    lambda_client = boto3.client('lambda')
+    lambda_client = boto3.client('lambda', region_name='us-east-2')
     payload = {
         "input_bucket": input_bucket,
         "pivot_file_key": pivot_file_key,
