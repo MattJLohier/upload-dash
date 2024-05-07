@@ -131,7 +131,7 @@ def call_lambda_merge(input_bucket, pivot_file_key, report_file_key, output_buck
         "output_file_key": output_file_key
     }
     response = lambda_client.invoke(
-        FunctionName='quicksight-consolidator',
+        FunctionName='Consolidator',
         InvocationType='RequestResponse',
         Payload=json.dumps(payload)
     )
