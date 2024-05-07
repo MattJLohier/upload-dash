@@ -115,28 +115,23 @@ def upload_file_to_s3(file_content, bucket_name, object_name, aws_access_key, aw
     except Exception as e:
         return False, f"Error uploading to S3: {str(e)}"
 
-def merge_in_chunks(file_pivot, file_report, output_file, progress=None, chunk_size=10000):
-    df_report = pd.read_excel(file_report, sheet_name="Product Details", header=5)
-    df_report.set_index("Product", inplace=True)
+def call_lambda_merge(input_bucket, pivot_file_key, report_file_key, output_bucket, output_file_key):
+    lambda_client = boto3.client('lambda')
+    payload = {
+        "input_bucket": input_bucket,
+        "pivot_file_key": pivot_file_key,
+        "report_file_key": report_file_key,
+        "output_bucket": output_bucket,
+        "output_file_key": output_file_key
+    }
+    response = lambda_client.invoke(
+        FunctionName='quicksight-consolidator',
+        InvocationType='RequestResponse',
+        Payload=json.dumps(payload)
+    )
+    response_from_lambda = json.load(response['Payload'])
+    return response_from_lambda
 
-    temp_csv = io.StringIO()
-    df_pivot_table = pd.read_excel(file_pivot, sheet_name="Product & Pricing Pivot Data", header=3)
-    df_pivot_table.to_csv(temp_csv, index=False)
-    temp_csv.seek(0)
-
-    total_chunks = sum(1 for _ in pd.read_csv(temp_csv, chunksize=chunk_size))
-    temp_csv.seek(0)
-
-    with pd.ExcelWriter(output_file, engine='xlsxwriter') as writer:
-        for i, chunk in enumerate(pd.read_csv(temp_csv, chunksize=chunk_size)):
-            chunk.set_index("Product", inplace=True)
-            merged_chunk = chunk.join(df_report, how='inner', lsuffix='_pivot', rsuffix='_report')
-            merged_chunk.reset_index(inplace=True)
-            startrow = i * chunk_size
-            merged_chunk.to_excel(writer, index=False, startrow=startrow, header=(i == 0))
-
-            if progress:
-                progress.progress((i + 1) / total_chunks)
 
 def display_dashboard():
     st.title("Upload Excel Files to S3")
@@ -144,43 +139,31 @@ def display_dashboard():
     file1 = st.file_uploader("Upload the first Excel file", type=["xlsx"])
     file2 = st.file_uploader("Upload the second Excel file", type=["xlsx"])
 
-    is_loading = st.session_state.get('is_loading', False)
-
-    if not is_loading:
-        upload_button = st.button("Process and Upload to S3", disabled=not (file1 and file2))
-    else:
-        upload_button = False
-
-    if upload_button:
-        st.session_state['is_loading'] = True
-
-        progress = st.progress(0)
-
-        with st.spinner('Processing data...'):
-            file_pivot = file1 if "PivotTable" in file1.name else file2
-            file_report = file1 if file_pivot != file1 else file2
-
-            output = io.BytesIO()
-            merge_in_chunks(file_pivot, file_report, output, progress)
-
+    if st.button("Process and Upload to S3", disabled=not (file1 and file2)):
+        with st.spinner('Uploading files to S3...'):
             bucket_name = st.secrets["bucket_name"]
-            merged_object_name = "Merged_Data.xlsx"
             aws_access_key = st.secrets["aws_access_key"]
             aws_secret_key = st.secrets["aws_secret_key"]
-            
-            st.write("Uploading Combined Data")
-            
-            output.seek(0)
-            success, message = upload_file_to_s3(output.getvalue(), bucket_name, merged_object_name, aws_access_key, aws_secret_key)
 
-            if success:
-                st.success("Merged data file was successfully uploaded to S3!")
-            else:
-                st.error("Failed to upload merged data to S3.")
-                st.write(message)
-        
-        st.session_state['is_loading'] = False
+            file_pivot = file1 if "PivotTable" in file1.name else file2
+            file_report = file1 if file_pivot != file1 else file2
+            
+            pivot_key = "pivot_data.xlsx"
+            report_key = "report_data.xlsx"
+            output_key = "merged_data.xlsx"
+            
+            # Upload files
+            upload_file_to_s3(file_pivot.getvalue(), bucket_name, pivot_key, aws_access_key, aws_secret_key)
+            upload_file_to_s3(file_report.getvalue(), bucket_name, report_key, aws_access_key, aws_secret_key)
 
+            # Call Lambda
+            response = call_lambda_merge(bucket_name, pivot_key, report_key, bucket_name, output_key)
+            st.success(f"Lambda function executed: {response['body']}")
+
+            # Optionally, you can provide a link to download the merged file or notify that it is available in S3
+            st.markdown(f"**Merged file available in S3:** {bucket_name}/{output_key}")
+
+st.session_state['is_loading'] = False
 
 
 if __name__ == "__main__":
