@@ -172,7 +172,7 @@ def display_dashboard():
                 aws_access_key,  # Pass credentials
                 aws_secret_key
             )
-            st.success(f"Lambda function executed: {response['body']}")
+            st.success("**Lambda function executed**")
 
             # Optionally, you can provide a link to download the merged file or notify that it is available in S3
             st.markdown("**Merged file available in S3:**")
