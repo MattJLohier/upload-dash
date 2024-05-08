@@ -124,11 +124,11 @@ def upload_file_to_s3(file_content, bucket_name, object_name, aws_access_key, aw
         for sheet_name in workbook.sheet_names:
             if sheet_name in target_sheets:
                 df = pd.read_excel(workbook, sheet_name=sheet_name)
-                csv_content = df.to_csv(index=False).encode()
+                tsv_content = df.to_csv(index=False, sep='\t').encode()
                 # Create a CSV filename based on the original file name without adding sheet names
-                csv_object_name = object_name.replace('.xlsx', '.csv')  # If no distinction is needed
-                s3.put_object(Bucket=bucket_name, Key=csv_object_name, Body=csv_content)
-                results.append(f"Successfully uploaded {csv_object_name}")
+                tsv_object_name = object_name.replace('.xlsx', '.tsv')  # If no distinction is needed
+                s3.put_object(Bucket=bucket_name, Key=tsv_object_name, Body=tsv_content)
+                results.append(f"Successfully uploaded {tsv_object_name}")
 
         if not results:
             return False, "None of the target sheets found in the file."
