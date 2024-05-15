@@ -160,8 +160,8 @@ def call_lambda_merge(input_bucket, pivot_file_key, report_file_key, output_buck
     return response_from_lambda
 
 
-def display_dashboard():
-    st.title("Update MFP Copier Report 📝")
+def pp_report():
+    st.title("Update P&P Quicksight 📝")
 
     file1 = st.file_uploader("Upload the first Excel file", type=["xlsx"])
     file2 = st.file_uploader("Upload the second Excel file", type=["xlsx"])
@@ -201,7 +201,13 @@ def display_dashboard():
             aws_secret_key
         )
 
-        st.title("Update Dealer Cost Report 🌎")
+def dcr_report():
+    st.title("Update DCR Quicksight 🌎")
+    pass
+
+def display_dashboard():
+    pp_report()  # Call the first section
+    dcr_report()  # Call the second, currently blank section
 
 if __name__ == "__main__":
     main()
