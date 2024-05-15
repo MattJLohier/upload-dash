@@ -161,7 +161,7 @@ def call_lambda_merge(input_bucket, pivot_file_key, report_file_key, output_buck
 
 
 def display_dashboard():
-    st.title("Upload Excel Files to S3")
+    st.title("Update MFP Copier Report 📝")
 
     file1 = st.file_uploader("Upload the first Excel file", type=["xlsx"])
     file2 = st.file_uploader("Upload the second Excel file", type=["xlsx"])
@@ -179,7 +179,7 @@ def display_dashboard():
         output_key = "merged_data.xlsx"
         
         progress_bar = st.progress(0)
-        
+
         # Upload files with progress bar
         with st.spinner('Uploading files to S3...'):
             upload_file_to_s3(file_pivot.getvalue(), bucket_name, pivot_key, aws_access_key, aws_secret_key)
@@ -200,6 +200,8 @@ def display_dashboard():
             aws_access_key,  # Pass credentials
             aws_secret_key
         )
+
+        st.title("Update Dealer Cost Report 🌎")
 
 if __name__ == "__main__":
     main()
