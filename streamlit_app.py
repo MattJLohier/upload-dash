@@ -157,8 +157,6 @@ def call_lambda_merge(input_bucket, pivot_file_key, report_file_key, output_buck
         Payload=json.dumps(payload)
     )
     response_from_lambda = json.load(response['Payload'])
-    return response_from_lambda
-
 
 def display_dashboard():
     st.title("Upload Excel Files to S3")
@@ -184,10 +182,7 @@ def display_dashboard():
             upload_file_to_s3(file_report.getvalue(), bucket_name, report_key, aws_access_key, aws_secret_key)
 
 
-            st.success("**Lambda function executed**")
-
-            # Optionally, you can provide a link to download the merged file or notify that it is available in S3
-            st.markdown("**Merged file available in S3:**")
+            st.success("**Lambda Function Called. Quicksight Will Refresh in 10 minutes**")
 
             # Call Lambda
             response = call_lambda_merge(
@@ -199,9 +194,6 @@ def display_dashboard():
                 aws_access_key,  # Pass credentials
                 aws_secret_key
             )
-           
-st.session_state['is_loading'] = False
-
 
 if __name__ == "__main__":
     main()
