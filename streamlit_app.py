@@ -178,12 +178,15 @@ def display_dashboard():
         report_key = "report_data.xlsx"
         output_key = "merged_data.xlsx"
         
-        # Upload files with spinner
+        # Upload files with progress bar
         with st.spinner('Uploading files to S3...'):
             upload_file_to_s3(file_pivot.getvalue(), bucket_name, pivot_key, aws_access_key, aws_secret_key)
-            upload_file_to_s3(file_report.getvalue(), bucket_name, report_key, aws_access_key, aws_secret_key)
+            progress_bar.progress(50)  # Update progress bar to 50%
 
-        st.success("✅**Files Uploaded to S3. Please Wait 10 Minutes For Quicksight To Update**")
+            upload_file_to_s3(file_report.getvalue(), bucket_name, report_key, aws_access_key, aws_secret_key)
+            progress_bar.progress(100)  # Update progress bar to 100%
+
+        st.success("✅**Files Uploaded to S3! Please Wait 10 Minutes For Quicksight To Update!**")
 
         # Call Lambda without spinner
         response = call_lambda_merge(
