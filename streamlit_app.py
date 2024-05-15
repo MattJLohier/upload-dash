@@ -178,6 +178,8 @@ def display_dashboard():
         report_key = "report_data.xlsx"
         output_key = "merged_data.xlsx"
         
+        progress_bar = st.progress(0)
+        
         # Upload files with progress bar
         with st.spinner('Uploading files to S3...'):
             upload_file_to_s3(file_pivot.getvalue(), bucket_name, pivot_key, aws_access_key, aws_secret_key)
