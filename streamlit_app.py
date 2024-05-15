@@ -238,12 +238,12 @@ def dcr_report():
 
                 if country == "BR":
                     # AUS: Header is on the 4th row, adjust indexing accordingly.
-                    df = pd.read_excel(file1, sheet_name='Pivot Table Data', header=7)
-              
+                    df = pd.read_excel(file1, sheet_name='Hardware Pricing', header=7)
+                    df = df.drop(df.index[0])
+                
                 processed_file = f"{country.lower()}_processed.xlsx"
                 with pd.ExcelWriter(processed_file) as writer:
                     df.to_excel(writer, sheet_name="Processed Data", index=False)
-
 
                 # Upload the modified file to S3
                 file_key = f"{country.lower()}_dcr.xlsx"
