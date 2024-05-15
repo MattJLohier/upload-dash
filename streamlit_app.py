@@ -233,13 +233,13 @@ def dcr_report():
                     df = pd.read_excel(file1, sheet_name='Pivot Table Data', header=3)
 
                 if country == "MX":
-                    # MX: Delete the first 3 rows from 'Product & Pricing Pivot Data'
-                    df['Product & Pricing Pivot Data'] = df['Product & Pricing Pivot Data'].iloc[3:]
-                elif country == "BR":
-                    # BR: Delete the first 7 rows and then row 9 from 'Hardware Pricing'
-                    df['Hardware Pricing'] = df['Hardware Pricing'].iloc[7:]
-                    df['Hardware Pricing'] = df['Hardware Pricing'].drop(df['Hardware Pricing'].index[1])  # After deleting first 7, the original row 9 becomes index 1
+                    # AUS: Header is on the 4th row, adjust indexing accordingly.
+                    df = pd.read_excel(file1, sheet_name='Pivot Table Data', header=3)
 
+                if country == "BR":
+                    # AUS: Header is on the 4th row, adjust indexing accordingly.
+                    df = pd.read_excel(file1, sheet_name='Pivot Table Data', header=7)
+              
                 processed_file = f"{country.lower()}_processed.xlsx"
                 with pd.ExcelWriter(processed_file) as writer:
                     for sheet_name, sheet_df in df.items():
