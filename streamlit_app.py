@@ -228,14 +228,19 @@ def dcr_report():
 
         if country in ["AUS", "MX", "BR"]:
             if file1:
-                df = pd.read_excel(file1, sheet_name=None)  # Load all sheets into a dictionary of DataFrames
                 if country == "AUS":
-                    df['Pivot Table Data'] = df['Pivot Table Data'].iloc[3:]  # Delete first 3 rows
-                elif country == "MX":
-                    df['Product & Pricing Pivot Data'] = df['Product & Pricing Pivot Data'].iloc[3:]  # Delete first 3 rows
+                    # AUS: Header is on the 4th row, adjust indexing accordingly.
+                    df = pd.read_excel(file1, sheet_name='Pivot Table Data', header=3)
+                else:
+                    df = pd.read_excel(file1, sheet_name=None)
+
+                if country == "MX":
+                    # MX: Delete the first 3 rows from 'Product & Pricing Pivot Data'
+                    df['Product & Pricing Pivot Data'] = df['Product & Pricing Pivot Data'].iloc[3:]
                 elif country == "BR":
-                    df['Hardware Pricing'] = df['Hardware Pricing'].iloc[7:]  # Delete first 7 rows
-                    df['Hardware Pricing'] = df['Hardware Pricing'].drop(df['Hardware Pricing'].index[1])  # Delete row 9, considering previous deletion
+                    # BR: Delete the first 7 rows and then row 9 from 'Hardware Pricing'
+                    df['Hardware Pricing'] = df['Hardware Pricing'].iloc[7:]
+                    df['Hardware Pricing'] = df['Hardware Pricing'].drop(df['Hardware Pricing'].index[1])  # After deleting first 7, the original row 9 becomes index 1
 
                 processed_file = f"{country.lower()}_processed.xlsx"
                 with pd.ExcelWriter(processed_file) as writer:
@@ -247,7 +252,7 @@ def dcr_report():
                 with st.spinner('Uploading modified file to S3...'):
                     with open(processed_file, "rb") as f:
                         upload_file_to_s3(f, bucket_name, file_key, aws_access_key, aws_secret_key)
-                st.success(f"✅**File Uploaded to S3! Please Wait 10 Minutes For Quicksight To Update!**")
+                st.success(f"✅**File Uploaded to S3!**")
         else:
             # Determine which file is pivot and which is report based on a condition in their names
             file_pivot = file1 if "Pivot Table Data" in file1.name else file2
