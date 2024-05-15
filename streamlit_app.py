@@ -160,6 +160,29 @@ def call_lambda_merge(input_bucket, pivot_file_key, report_file_key, output_buck
     return response_from_lambda
 
 
+def call_lambda_merge_dcr(input_bucket, pivot_file_key, report_file_key, output_bucket, output_file_key, aws_access_key, aws_secret_key):
+    lambda_client = boto3.client(
+        'lambda',
+        region_name='us-east-2',
+        aws_access_key_id=aws_access_key,
+        aws_secret_access_key=aws_secret_key
+    )
+    payload = {
+        "input_bucket": input_bucket,
+        "pivot_file_key": pivot_file_key,
+        "report_file_key": report_file_key,
+        "output_bucket": output_bucket,
+        "output_file_key": output_file_key
+    }
+    response = lambda_client.invoke(
+        FunctionName='DCR-Consolidator',
+        InvocationType='RequestResponse',
+        Payload=json.dumps(payload)
+    )
+    response_from_lambda = json.load(response['Payload'])
+    return response_from_lambda
+
+
 def pp_report():
     st.title("Update P&P Quicksight 📝")
 
@@ -269,7 +292,7 @@ def dcr_report():
                 progress_bar.progress(100)
             st.success("✅**Files Uploaded to S3! Please Wait 10 Minutes For Quicksight To Update!**")
             # Call Lambda without spinner
-            response = call_lambda_merge(
+            response = call_lambda_merge_dcr(
                 bucket_name,
                 pivot_key,
                 report_key,
