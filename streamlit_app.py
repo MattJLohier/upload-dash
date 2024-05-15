@@ -242,8 +242,8 @@ def dcr_report():
               
                 processed_file = f"{country.lower()}_processed.xlsx"
                 with pd.ExcelWriter(processed_file) as writer:
-                    for sheet_name, sheet_df in df.items():
-                        sheet_df.to_excel(writer, sheet_name=sheet_name, index=False)
+                    df.to_excel(writer, sheet_name="Processed Data", index=False)
+
 
                 # Upload the modified file to S3
                 file_key = f"{country.lower()}_dcr.xlsx"
