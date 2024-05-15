@@ -194,7 +194,7 @@ def display_dashboard():
                 aws_secret_key
             )
     
-    st.success("**Lambda Function Called.**")
+            st.success("**Lambda Function Called.**")
 
 if __name__ == "__main__":
     main()
