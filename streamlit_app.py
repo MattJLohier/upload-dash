@@ -201,26 +201,81 @@ def pp_report():
             aws_secret_key
         )
 
+
 def dcr_report():
     st.title("Update DCR Quicksight 🌎")
 
     # Dropdown menu for selecting a country with a unique key
     country = st.selectbox(
         "Select Your Country",
-        ["AUS", "BR", "CA", "DE", "ES", "FR", "IT", "MX", "UK", "US"],
-        key='country_select'  # Unique key for the selectbox
+        ["US", "AUS", "BR", "CA", "DE", "ES", "FR", "IT", "MX", "UK"],
+        key='country_select'
     )
 
     # Conditional display of upload boxes based on country selection
     if country in ["AUS", "MX", "BR"]:
-        # Use a unique key for the file uploader
         file1 = st.file_uploader("Upload the file", type=["xlsx"], key='single_file_uploader')
+        process_button = st.button("Process and Upload to S3", disabled=file1 is None)
     else:
-        # Use unique keys for each file uploader
         file1 = st.file_uploader("Upload the first Excel file", type=["xlsx"], key='first_file_uploader')
         file2 = st.file_uploader("Upload the second Excel file", type=["xlsx"], key='second_file_uploader')
+        process_button = st.button("Process and Upload to S3", disabled=not (file1 and file2))
 
+    if process_button:
+        bucket_name = st.secrets["bucket_name"]
+        aws_access_key = st.secrets["aws_access_key"]
+        aws_secret_key = st.secrets["aws_secret_key"]
 
+        if country in ["AUS", "MX", "BR"]:
+            if file1:
+                df = pd.read_excel(file1, sheet_name=None)  # Load all sheets into a dictionary of DataFrames
+                if country == "AUS":
+                    df['Pivot Table Data'] = df['Pivot Table Data'].iloc[3:]  # Delete first 3 rows
+                elif country == "MX":
+                    df['Product & Pricing Pivot Data'] = df['Product & Pricing Pivot Data'].iloc[3:]  # Delete first 3 rows
+                elif country == "BR":
+                    df['Hardware Pricing'] = df['Hardware Pricing'].iloc[7:]  # Delete first 7 rows
+                    df['Hardware Pricing'] = df['Hardware Pricing'].drop(df['Hardware Pricing'].index[1])  # Delete row 9, considering previous deletion
+
+                processed_file = f"{country.lower()}_processed.xlsx"
+                with pd.ExcelWriter(processed_file) as writer:
+                    for sheet_name, sheet_df in df.items():
+                        sheet_df.to_excel(writer, sheet_name=sheet_name, index=False)
+
+                # Upload the modified file to S3
+                file_key = f"{country.lower()}_dcr.xlsx"
+                with st.spinner('Uploading modified file to S3...'):
+                    with open(processed_file, "rb") as f:
+                        upload_file_to_s3(f, bucket_name, file_key, aws_access_key, aws_secret_key)
+                st.success(f"✅**File Uploaded to S3! Please Wait 10 Minutes For Quicksight To Update!**")
+        else:
+            # Determine which file is pivot and which is report based on a condition in their names
+            file_pivot = file1 if "Pivot Table Data" in file1.name else file2
+            file_report = file1 if file_pivot != file1 else file2
+
+            # Dynamically set keys based on the selected country
+            pivot_key = f"{country.lower()}_pivot.xlsx"
+            report_key = f"{country.lower()}_report.xlsx"
+            output_key = f"{country.lower()}_merged.xlsx"
+
+            progress_bar = st.progress(0)
+            with st.spinner('Uploading files to S3...'):
+                upload_file_to_s3(file_pivot.getvalue(), bucket_name, pivot_key, aws_access_key, aws_secret_key)
+                progress_bar.progress(50)
+                upload_file_to_s3(file_report.getvalue(), bucket_name, report_key, aws_access_key, aws_secret_key)
+                progress_bar.progress(100)
+            st.success("✅**Files Uploaded to S3! Please Wait 10 Minutes For Quicksight To Update!**")
+            # Call Lambda without spinner
+            response = call_lambda_merge(
+                bucket_name,
+                pivot_key,
+                report_key,
+                bucket_name,
+                output_key,
+                aws_access_key,  # Pass credentials
+                aws_secret_key
+            )
+        
 def display_dashboard():
     pp_report()  # Call the first section
     dcr_report()  # Call the second, currently blank section
