@@ -215,11 +215,11 @@ def dcr_report():
     # Conditional display of upload boxes based on country selection
     if country in ["AUS", "MX", "BR"]:
         file1 = st.file_uploader("Upload the file", type=["xlsx"], key='single_file_uploader')
-        process_button = st.button("Process and Upload to S3", disabled=file1 is None)
+        process_button = st.button("Process and Upload to S3", key='key2', disabled=file1 is None)
     else:
         file1 = st.file_uploader("Upload the first Excel file", type=["xlsx"], key='first_file_uploader')
         file2 = st.file_uploader("Upload the second Excel file", type=["xlsx"], key='second_file_uploader')
-        process_button = st.button("Process and Upload to S3", disabled=not (file1 and file2))
+        process_button = st.button("Process and Upload to S3", key='key1', disabled=not (file1 and file2))
 
     if process_button:
         bucket_name = st.secrets["bucket_name"]
