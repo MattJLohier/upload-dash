@@ -183,7 +183,7 @@ def display_dashboard():
             upload_file_to_s3(file_pivot.getvalue(), bucket_name, pivot_key, aws_access_key, aws_secret_key)
             upload_file_to_s3(file_report.getvalue(), bucket_name, report_key, aws_access_key, aws_secret_key)
 
-        st.success("**Files Uploaded to S3.**")
+        st.success("✅**Files Uploaded to S3. Please Wait 10 Minutes For Quicksight To Update**")
 
         # Call Lambda without spinner
         response = call_lambda_merge(
@@ -195,8 +195,6 @@ def display_dashboard():
             aws_access_key,  # Pass credentials
             aws_secret_key
         )
-
-        st.success("**Lambda Function Called.**")
 
 if __name__ == "__main__":
     main()
