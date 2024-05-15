@@ -207,7 +207,7 @@ def dcr_report():
     # Dropdown menu for selecting a country with a unique key
     country = st.selectbox(
         "Select Your Country",
-        ["AUS", "BR", "CA", "DE", "ES", "FR", "IT", "MX", "UK"],
+        ["AUS", "BR", "CA", "DE", "ES", "FR", "IT", "MX", "UK", "US"],
         key='country_select'  # Unique key for the selectbox
     )
 
