@@ -204,18 +204,22 @@ def pp_report():
 def dcr_report():
     st.title("Update DCR Quicksight 🌎")
 
-    # Dropdown menu for selecting a country
+    # Dropdown menu for selecting a country with a unique key
     country = st.selectbox(
         "Select Your Country",
-        ["AUS", "BR", "CA", "DE", "ES", "FR", "IT", "MX", "UK"]
+        ["AUS", "BR", "CA", "DE", "ES", "FR", "IT", "MX", "UK"],
+        key='country_select'  # Unique key for the selectbox
     )
 
     # Conditional display of upload boxes based on country selection
     if country in ["AUS", "MX", "BR"]:
-        file1 = st.file_uploader("Upload the file", type=["xlsx"])
+        # Use a unique key for the file uploader
+        file1 = st.file_uploader("Upload the file", type=["xlsx"], key='single_file_uploader')
     else:
-        file1 = st.file_uploader("Upload the first Excel file", type=["xlsx"])
-        file2 = st.file_uploader("Upload the second Excel file", type=["xlsx"])
+        # Use unique keys for each file uploader
+        file1 = st.file_uploader("Upload the first Excel file", type=["xlsx"], key='first_file_uploader')
+        file2 = st.file_uploader("Upload the second Excel file", type=["xlsx"], key='second_file_uploader')
+
 
 def display_dashboard():
     pp_report()  # Call the first section
