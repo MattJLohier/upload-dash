@@ -231,8 +231,6 @@ def dcr_report():
                 if country == "AUS":
                     # AUS: Header is on the 4th row, adjust indexing accordingly.
                     df = pd.read_excel(file1, sheet_name='Pivot Table Data', header=3)
-                else:
-                    df = pd.read_excel(file1, sheet_name=None)
 
                 if country == "MX":
                     # MX: Delete the first 3 rows from 'Product & Pricing Pivot Data'
