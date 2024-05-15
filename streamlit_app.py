@@ -183,6 +183,12 @@ def display_dashboard():
             upload_file_to_s3(file_pivot.getvalue(), bucket_name, pivot_key, aws_access_key, aws_secret_key)
             upload_file_to_s3(file_report.getvalue(), bucket_name, report_key, aws_access_key, aws_secret_key)
 
+
+            st.success("**Lambda function executed**")
+
+            # Optionally, you can provide a link to download the merged file or notify that it is available in S3
+            st.markdown("**Merged file available in S3:**")
+
             # Call Lambda
             response = call_lambda_merge(
                 bucket_name,
@@ -193,11 +199,7 @@ def display_dashboard():
                 aws_access_key,  # Pass credentials
                 aws_secret_key
             )
-            st.success("**Lambda function executed**")
-
-            # Optionally, you can provide a link to download the merged file or notify that it is available in S3
-            st.markdown("**Merged file available in S3:**")
-
+           
 st.session_state['is_loading'] = False
 
 
