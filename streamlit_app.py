@@ -158,42 +158,41 @@ def call_lambda_merge(input_bucket, pivot_file_key, report_file_key, output_buck
     )
     response_from_lambda = json.load(response['Payload'])
 
-def display_dashboard():
-    st.title("Upload Excel Files to S3")
+    def display_dashboard():
+        st.title("Upload Excel Files to S3")
 
-    file1 = st.file_uploader("Upload the first Excel file", type=["xlsx"])
-    file2 = st.file_uploader("Upload the second Excel file", type=["xlsx"])
+        file1 = st.file_uploader("Upload the first Excel file", type=["xlsx"])
+        file2 = st.file_uploader("Upload the second Excel file", type=["xlsx"])
 
-    if st.button("Process and Upload to S3", disabled=not (file1 and file2)):
-        with st.spinner('Uploading files to S3...'):
-            bucket_name = st.secrets["bucket_name"]
-            aws_access_key = st.secrets["aws_access_key"]
-            aws_secret_key = st.secrets["aws_secret_key"]
+        if st.button("Process and Upload to S3", disabled=not (file1 and file2)):
+            with st.spinner('Uploading files to S3...'):
+                bucket_name = st.secrets["bucket_name"]
+                aws_access_key = st.secrets["aws_access_key"]
+                aws_secret_key = st.secrets["aws_secret_key"]
 
-            file_pivot = file1 if "PivotTable" in file1.name else file2
-            file_report = file1 if file_pivot != file1 else file2
-            
-            pivot_key = "pivot_data.xlsx"
-            report_key = "report_data.xlsx"
-            output_key = "merged_data.xlsx"
-            
-            # Upload files
-            upload_file_to_s3(file_pivot.getvalue(), bucket_name, pivot_key, aws_access_key, aws_secret_key)
-            upload_file_to_s3(file_report.getvalue(), bucket_name, report_key, aws_access_key, aws_secret_key)
+                file_pivot = file1 if "PivotTable" in file1.name else file2
+                file_report = file1 if file_pivot != file1 else file2
+                
+                pivot_key = "pivot_data.xlsx"
+                report_key = "report_data.xlsx"
+                output_key = "merged_data.xlsx"
+                
+                # Upload files
+                upload_file_to_s3(file_pivot.getvalue(), bucket_name, pivot_key, aws_access_key, aws_secret_key)
+                upload_file_to_s3(file_report.getvalue(), bucket_name, report_key, aws_access_key, aws_secret_key)
 
+                # Call Lambda
+                response = call_lambda_merge(
+                    bucket_name,
+                    pivot_key,
+                    report_key,
+                    bucket_name,
+                    output_key,
+                    aws_access_key,  # Pass credentials
+                    aws_secret_key
+                )
 
-            st.success("**Lambda Function Called. Quicksight Will Refresh in 10 minutes**")
+                st.success("**Lambda Function Called. Quicksight Will Refresh in 10 minutes**")
 
-            # Call Lambda
-            response = call_lambda_merge(
-                bucket_name,
-                pivot_key,
-                report_key,
-                bucket_name,
-                output_key,
-                aws_access_key,  # Pass credentials
-                aws_secret_key
-            )
-
-if __name__ == "__main__":
-    main()
+    if __name__ == "__main__":
+        main()
