@@ -203,7 +203,19 @@ def pp_report():
 
 def dcr_report():
     st.title("Update DCR Quicksight 🌎")
-    pass
+
+    # Dropdown menu for selecting a country
+    country = st.selectbox(
+        "Select Your Country",
+        ["AUS", "BR", "CA", "DE", "ES", "FR", "IT", "MX", "UK"]
+    )
+
+    # Conditional display of upload boxes based on country selection
+    if country in ["AUS", "MX", "BR"]:
+        file1 = st.file_uploader("Upload the file", type=["xlsx"])
+    else:
+        file1 = st.file_uploader("Upload the first Excel file", type=["xlsx"])
+        file2 = st.file_uploader("Upload the second Excel file", type=["xlsx"])
 
 def display_dashboard():
     pp_report()  # Call the first section
