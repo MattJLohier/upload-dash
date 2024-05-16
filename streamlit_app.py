@@ -298,13 +298,11 @@ def dcr_report():
                     df_pivot.to_excel(writer, sheet_name="Pivot Table Data", index=False)
 
             file_key = f"{country.lower()}_pivot.xlsx"
-
+            progress_bar = st.progress(0)
             # Dynamically set keys based on the selected country
             pivot_key = f"{country.lower()}_pivot.xlsx"
             report_key = f"{country.lower()}_report.xlsx"
             output_key = f"{country.lower()}_merged.xlsx"
-
-            progress_bar = st.progress(0)
            
             with st.spinner('Uploading files to S3...'):
                 with open(merged_file, "rb") as f:
