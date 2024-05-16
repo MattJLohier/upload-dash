@@ -207,7 +207,7 @@ def pp_report():
             upload_file_to_s3(file_report.getvalue(), bucket_name, report_key, aws_access_key, aws_secret_key)
             progress_bar.progress(100)  # Update progress bar to 100%
 
-        st.success("✅**Files Uploaded to S3! Please Wait 10 Minutes For Quicksight To Update!**")
+        st.success("✅**Files Uploaded to S3!**")
 
         # Call Lambda without spinner
         response = call_lambda_merge(
@@ -286,7 +286,7 @@ def dcr_report():
                 progress_bar.progress(50)
                 upload_file_to_s3(file_report.getvalue(), bucket_name, report_key, aws_access_key, aws_secret_key)
                 progress_bar.progress(100)
-            st.success("✅**Files Uploaded to S3! Please Wait 10 Minutes For Quicksight To Update!**")
+            st.success("✅**Files Uploaded to S3!**")
             # Call Lambda without spinner
             response = call_lambda_merge_dcr(
                 bucket_name,
