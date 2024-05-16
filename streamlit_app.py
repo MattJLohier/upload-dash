@@ -304,15 +304,21 @@ def display_dashboard():
     css = """
     <style>
     div.stAlert {
-        background-color: #ff6600;
+        background-color: #ff6600;  /* Darker orange color */
     }
     </style>
     """
 
     st.markdown(css, unsafe_allow_html=True)  # Inject custom CSS
 
-    # Display an info message with the new red background
-    st.info("⚠️ Quicksight Does NOT Automatically Refresh When You Upload. It Refreshes Automatically Every Sunday Night. <br> To Force a Refresh, go to Quicksights>Datasets>MFP-Copier>Refresh>Refresh Now")
+    # Construct the message with HTML for line breaks
+    message = """
+    Quicksight Does NOT Automatically Refresh When You Upload.<br>
+    It Refreshes Weekly on Sunday Night, Unless You Force a Refresh By Going to Quicksights &gt; Datasets
+    """
+
+    # Use markdown to display the message with a line break
+    st.markdown(f'<div class="stAlert">{message}</div>', unsafe_allow_html=True)
     pp_report()  # Call the first section
     dcr_report()  # Call the second, currently blank section
 
