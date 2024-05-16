@@ -288,6 +288,7 @@ def dcr_report():
                     df_pivot = pd.read_excel(file_pivot, sheet_name="Pivot Table Data", header=3)
 
                 df_mapping = pd.read_excel(file_mapping)
+                df_pivot = df_pivot.drop_duplicates(subset='Product')
 
                 #st.write(df_pivot)
                 # Merge file_mapping into file_pivot on the 'Product' column
