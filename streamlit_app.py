@@ -292,15 +292,24 @@ def dcr_report():
                 #st.write(df_pivot)
                 # Merge file_mapping into file_pivot on the 'Product' column
                 df_pivot = pd.merge(df_pivot, df_mapping, on='Product', how='left')
-                st.write(df_pivot)
+
+                merged_file = "merged_pivot.xlsx"
+                with pd.ExcelWriter(merged_file) as writer:
+                    df_pivot.to_excel(writer, sheet_name="Pivot Table Data", index=False)
+
+            file_key = f"{country.lower()}_pivot.xlsx"
+
             # Dynamically set keys based on the selected country
             pivot_key = f"{country.lower()}_pivot.xlsx"
             report_key = f"{country.lower()}_report.xlsx"
             output_key = f"{country.lower()}_merged.xlsx"
 
             progress_bar = st.progress(0)
+           
             with st.spinner('Uploading files to S3...'):
-                upload_file_to_s3(file_pivot.getvalue(), bucket_name, pivot_key, aws_access_key, aws_secret_key)
+                with open(merged_file, "rb") as f:
+                    upload_file_to_s3(f, bucket_name, file_key, aws_access_key, aws_secret_key)
+                #upload_file_to_s3(file_pivot.getvalue(), bucket_name, pivot_key, aws_access_key, aws_secret_key)
                 progress_bar.progress(50)
                 upload_file_to_s3(file_report.getvalue(), bucket_name, report_key, aws_access_key, aws_secret_key)
                 progress_bar.progress(100)
