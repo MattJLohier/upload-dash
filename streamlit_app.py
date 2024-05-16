@@ -276,9 +276,9 @@ def dcr_report():
                 st.success(f"✅**File Uploaded to S3!**")
         else:
             # Determine which file is pivot and which is report based on a condition in their names
-            file_pivot = file3 if "Pivot Table Data" in file3.name else file2
-            file_report = file3 if file_pivot != file3 else file2
-
+            file_report = file3 if "MFP_Copier_Report" in file3.name or "EU MFP" in file3.name else file2
+            file_pivot = file3 if file_report != file3 else file2
+            
             # Dynamically set keys based on the selected country
             pivot_key = f"{country.lower()}_pivot.xlsx"
             report_key = f"{country.lower()}_report.xlsx"
