@@ -283,7 +283,7 @@ def dcr_report():
             else:
                 # Load the data from the uploaded files
                 try:
-                    df_pivot = pd.read_excel(file_pivot, sheet_name="Product & Pricing Pivot Data")
+                    df_pivot = pd.read_excel(file_pivot, sheet_name="Product & Pricing Pivot Data", header=3)
                 except:
                     df_pivot = pd.read_excel(file_pivot, sheet_name="Pivot Table Data")
 
