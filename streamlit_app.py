@@ -184,7 +184,7 @@ def pp_report():
 
     file1 = st.file_uploader("Upload the MFP Pivot Table", type=["xlsx"])
     file2 = st.file_uploader("Upload the MFP Copier Report", type=["xlsx"])
-    file3 = st.file_uploader("Upload the UID Mapping File", type=["xlsx"])
+    
 
     if st.button("Process and Upload to S3", disabled=not (file1 and file2)):
         bucket_name = st.secrets["bucket_name"]
@@ -193,23 +193,6 @@ def pp_report():
 
         file_pivot = file1 if "PivotTable" in file1.name else file2
         file_report = file1 if file_pivot != file1 else file2
-        file_mapping = file3 if "mapping" in file3.name else None
-        
-        # Ensure all necessary files are mapped
-        if not file_mapping:
-            st.error("UID Mapping File is not correctly uploaded or named.")
-        else:
-            # Load the data from the uploaded files
-            try:
-                df_pivot = pd.read_excel(file_pivot, sheet_name="Product & Pricing Pivot Data")
-            except:
-                df_pivot = pd.read_excel(file_pivot, sheet_name="Pivot Table Data")
-
-            df_mapping = pd.read_excel(file_mapping)
-
-            # Merge file_mapping into file_pivot on the 'Product' column
-            df_pivot = pd.merge(df_pivot, df_mapping, on='Product', how='left')
-
         pivot_key = "pivot_data.xlsx"
         report_key = "report_data.xlsx"
         output_key = "merged_data.xlsx"
@@ -255,6 +238,7 @@ def dcr_report():
     else:
         file3 = st.file_uploader("Upload A DCR File", type=["xlsx"], key='first_file_uploader')
         file2 = st.file_uploader("Upload Specs; EU TCO or US P&P ", type=["xlsx"], key='second_file_uploader')
+        file4 = st.file_uploader("Upload the UID Mapping File", type=["xlsx"])
         process_button = st.button("Process and Upload to S3", key='key1', disabled=not (file3 and file2))
 
     if process_button:
@@ -291,7 +275,23 @@ def dcr_report():
             # Determine which file is pivot and which is report based on a condition in their names
             file_report = file3 if "MFP_Copier_Report" in file3.name or "EU MFP" in file3.name else file2
             file_pivot = file3 if file_report != file3 else file2
+            file_mapping = file4 if "mapping" in file4.name else None
             
+            # Ensure all necessary files are mapped
+            if not file_mapping:
+                st.error("UID Mapping File is not correctly uploaded or named.")
+            else:
+                # Load the data from the uploaded files
+                try:
+                    df_pivot = pd.read_excel(file_pivot, sheet_name="Product & Pricing Pivot Data")
+                except:
+                    df_pivot = pd.read_excel(file_pivot, sheet_name="Pivot Table Data")
+
+                df_mapping = pd.read_excel(file_mapping)
+
+                # Merge file_mapping into file_pivot on the 'Product' column
+                df_pivot = pd.merge(df_pivot, df_mapping, on='Product', how='left')
+
             # Dynamically set keys based on the selected country
             pivot_key = f"{country.lower()}_pivot.xlsx"
             report_key = f"{country.lower()}_report.xlsx"
