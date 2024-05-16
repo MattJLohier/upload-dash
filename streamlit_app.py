@@ -240,7 +240,7 @@ def dcr_report():
         file1 = st.file_uploader("Upload the file", type=["xlsx"], key='single_file_uploader')
         process_button = st.button("Process and Upload to S3", key='key2', disabled=file1 is None)
     else:
-        file1 = st.file_uploader("Upload the first Excel file", type=["xlsx"], key='first_file_uploader')
+        file3 = st.file_uploader("Upload the first Excel file", type=["xlsx"], key='first_file_uploader')
         file2 = st.file_uploader("Upload the second Excel file", type=["xlsx"], key='second_file_uploader')
         process_button = st.button("Process and Upload to S3", key='key1', disabled=not (file1 and file2))
 
@@ -276,8 +276,10 @@ def dcr_report():
                 st.success(f"✅**File Uploaded to S3!**")
         else:
             # Determine which file is pivot and which is report based on a condition in their names
-            file_pivot = file1 if "Pivot Table Data" in file1.name else file2
-            file_report = file1 if file_pivot != file1 else file2
+            file_pivot = file3 if "Pivot Table Data" in file3.name else file2
+            file_report = file3 if file_pivot != file3 else file2
+
+            st.write(file_pivot)
 
             # Dynamically set keys based on the selected country
             pivot_key = f"{country.lower()}_pivot.xlsx"
