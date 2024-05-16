@@ -299,12 +299,12 @@ def dcr_report():
             )
         
 def display_dashboard():
-    st.header("Update Copiers Quicksight Data")
+    st.header("Update Copiers Quicksight Data 🔄")
     # Custom CSS to override the default info color
     css = """
     <style>
     div.stAlert {
-        background-color: #ff4d4d;  /* Red color */
+        background-color: #ffcc00; 
     }
     </style>
     """
@@ -312,7 +312,7 @@ def display_dashboard():
     st.markdown(css, unsafe_allow_html=True)  # Inject custom CSS
 
     # Display an info message with the new red background
-    st.info("Quicksight Does NOT Automatically Refresh When You Upload. It Refreshes Weekly on Sunday Night, Unless You Force a Refresh By Going to Quicksights>Datasets>")
+    st.info("⚠️ Quicksight Does NOT Automatically Refresh When You Upload. It Refreshes Weekly on Sunday Night, Unless You Force a Refresh By Going to Quicksights>Datasets>")
     pp_report()  # Call the first section
     dcr_report()  # Call the second, currently blank section
 
