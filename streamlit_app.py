@@ -299,6 +299,8 @@ def dcr_report():
             )
         
 def display_dashboard():
+    st.info("Use This Portal to Update MFP Copiers Quicksight Dashboards.")
+    st.info("Quicksight Does NOT Automatically Refresh When You Upload. It Refreshes Weekly on Sunday Night, Unless You Force a Refresh By Going to Quicksights>Datasets>")
     pp_report()  # Call the first section
     dcr_report()  # Call the second, currently blank section
 
