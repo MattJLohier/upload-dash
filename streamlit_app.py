@@ -184,6 +184,7 @@ def pp_report():
 
     file1 = st.file_uploader("Upload the MFP Pivot Table", type=["xlsx"])
     file2 = st.file_uploader("Upload the MFP Copier Report", type=["xlsx"])
+    file3 = st.file_uploader("Upload the UID Mapping File", type=["xlsx"])
 
     if st.button("Process and Upload to S3", disabled=not (file1 and file2)):
         bucket_name = st.secrets["bucket_name"]
@@ -192,7 +193,23 @@ def pp_report():
 
         file_pivot = file1 if "PivotTable" in file1.name else file2
         file_report = file1 if file_pivot != file1 else file2
+        file_mapping = file3 if "mapping" in file3.name else None
         
+        # Ensure all necessary files are mapped
+        if not file_mapping:
+            st.error("UID Mapping File is not correctly uploaded or named.")
+        else:
+            # Load the data from the uploaded files
+            try:
+                df_pivot = pd.read_excel(file_pivot, sheet_name="Product & Pricing Pivot Data")
+            except:
+                df_pivot = pd.read_excel(file_pivot, sheet_name="Pivot Table Data")
+
+            df_mapping = pd.read_excel(file_mapping)
+
+            # Merge file_mapping into file_pivot on the 'Product' column
+            df_pivot = pd.merge(df_pivot, df_mapping, on='Product', how='left')
+
         pivot_key = "pivot_data.xlsx"
         report_key = "report_data.xlsx"
         output_key = "merged_data.xlsx"
