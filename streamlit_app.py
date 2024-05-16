@@ -285,14 +285,14 @@ def dcr_report():
                 try:
                     df_pivot = pd.read_excel(file_pivot, sheet_name="Product & Pricing Pivot Data", header=3)
                 except:
-                    df_pivot = pd.read_excel(file_pivot, sheet_name="Pivot Table Data")
+                    df_pivot = pd.read_excel(file_pivot, sheet_name="Pivot Table Data", header=3)
 
                 df_mapping = pd.read_excel(file_mapping)
 
                 #st.write(df_pivot)
                 # Merge file_mapping into file_pivot on the 'Product' column
                 df_pivot = pd.merge(df_pivot, df_mapping, on='Product', how='left')
-
+                st.write(df_pivot)
             # Dynamically set keys based on the selected country
             pivot_key = f"{country.lower()}_pivot.xlsx"
             report_key = f"{country.lower()}_report.xlsx"
