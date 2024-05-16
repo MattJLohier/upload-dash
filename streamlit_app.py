@@ -33,7 +33,7 @@ st.set_page_config(
 
 
 def sidebar():
-    st.sidebar.image("https://i.postimg.cc/XJdg0y7b/scooper-logo.png", use_column_width=True)
+    st.sidebar.image("https://i.postimg.cc/xd8mgd7c/OB-Primary-Logo-01-Full-Color-2.png", use_column_width=True)
     st.sidebar.markdown("---")
 
 def login(username, password):
