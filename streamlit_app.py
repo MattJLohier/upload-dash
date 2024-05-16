@@ -275,8 +275,8 @@ def dcr_report():
             # Determine which file is pivot and which is report based on a condition in their names
             file_report = file3 if "MFP_Copier_Report" in file3.name or "EU MFP" in file3.name else file2
             file_pivot = file3 if file_report != file3 else file2
-            file_mapping = file4 if "mapping" in file4.name else None
-            
+            file_mapping = file4 if "Mapping" in file4.name else None
+
             # Ensure all necessary files are mapped
             if not file_mapping:
                 st.error("UID Mapping File is not correctly uploaded or named.")
