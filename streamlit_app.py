@@ -289,7 +289,7 @@ def dcr_report():
 
                 df_mapping = pd.read_excel(file_mapping)
 
-                st.write(df_pivot)
+                #st.write(df_pivot)
                 # Merge file_mapping into file_pivot on the 'Product' column
                 df_pivot = pd.merge(df_pivot, df_mapping, on='Product', how='left')
 
