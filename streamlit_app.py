@@ -58,7 +58,7 @@ def display_login_form():
     with col2:  # Middle column for the form
         st.markdown("""
         <center>
-            <img src='https://i.postimg.cc/XJdg0y7b/scooper-logo.png' width='300'>
+            <img src='https://i.postimg.cc/yx4SVyNZ/OB-Logomark-Primary-Colors-3.png' width='300'>
         </center>
         """, unsafe_allow_html=True)
         with st.form(key='login_form'):
