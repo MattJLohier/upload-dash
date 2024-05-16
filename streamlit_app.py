@@ -180,7 +180,7 @@ def call_lambda_merge_dcr(input_bucket, pivot_file_key, report_file_key, output_
 
 
 def pp_report():
-    st.title("Update P&P Quicksight 📝")
+    st.subheader("Update P&P Quicksight 📝")
 
     file1 = st.file_uploader("Upload the first Excel file", type=["xlsx"])
     file2 = st.file_uploader("Upload the second Excel file", type=["xlsx"])
@@ -222,7 +222,7 @@ def pp_report():
 
 
 def dcr_report():
-    st.title("Update DCR Quicksight 🌎")
+    st.subheader("Update DCR Quicksight 🌎")
 
     # Dropdown menu for selecting a country with a unique key
     country = st.selectbox(
@@ -299,7 +299,7 @@ def dcr_report():
             )
         
 def display_dashboard():
-    st.info("Use This Portal to Update MFP Copiers Quicksight Dashboards.")
+    st.subheader("Use This Portal to Update MFP Copiers Quicksight Dashboards.")
     st.info("Quicksight Does NOT Automatically Refresh When You Upload. It Refreshes Weekly on Sunday Night, Unless You Force a Refresh By Going to Quicksights>Datasets>")
     pp_report()  # Call the first section
     dcr_report()  # Call the second, currently blank section
