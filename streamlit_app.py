@@ -306,6 +306,7 @@ def dcr_report():
                     df_report.to_excel(writer, sheet_name="Product Details", index=False)
 
             file_key = f"{country.lower()}_pivot.xlsx"
+            file_key2 = f"{country.lower()}_report.xlsx"
             progress_bar = st.progress(0)
             # Dynamically set keys based on the selected country
             pivot_key = f"{country.lower()}_pivot.xlsx"
@@ -317,7 +318,7 @@ def dcr_report():
                     upload_file_to_s3(f, bucket_name, file_key, aws_access_key, aws_secret_key)
                 progress_bar.progress(50)
                 with open(merged_file2, "rb") as f:
-                    upload_file_to_s3(f, bucket_name, file_key, aws_access_key, aws_secret_key)
+                    upload_file_to_s3(f, bucket_name, file_key2, aws_access_key, aws_secret_key)
                 #upload_file_to_s3(file_pivot.getvalue(), bucket_name, pivot_key, aws_access_key, aws_secret_key)
                 progress_bar.progress(100)
             st.success("✅**Files Uploaded to S3!**")
