@@ -309,9 +309,9 @@ def dcr_report():
             file_key2 = f"{country.lower()}_report.xlsx"
             progress_bar = st.progress(0)
             # Dynamically set keys based on the selected country
-            pivot_key = f"{country.lower()}_pivot.xlsx"
-            report_key = f"{country.lower()}_report.xlsx"
-            output_key = f"{country.lower()}_merged.xlsx"
+            pivot_key = "us_pivot.xlsx"
+            report_key = "us_report.xlsx"
+            output_key = "us_merged.xlsx"
            
             with st.spinner('Uploading files to S3...'):
                 with open(merged_file, "rb") as f:
