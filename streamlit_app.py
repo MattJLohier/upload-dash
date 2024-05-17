@@ -301,7 +301,7 @@ def dcr_report():
                 with pd.ExcelWriter(merged_file) as writer:
                     df_pivot.to_excel(writer, sheet_name="Product & Pricing Pivot Data", index=False)
 
-                merged_file2 = "merged_pivot.xlsx"
+                merged_file2 = "merged_report.xlsx"
                 with pd.ExcelWriter(merged_file2) as writer:
                     df_report.to_excel(writer, sheet_name="Product Details", index=False)
 
