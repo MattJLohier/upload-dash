@@ -271,6 +271,68 @@ def dcr_report():
                     with open(processed_file, "rb") as f:
                         upload_file_to_s3(f, bucket_name, file_key, aws_access_key, aws_secret_key)
                 st.success(f"✅**File Uploaded to S3!**")
+        
+        elif country in ["US"]:
+            file_report = file3 if "MFP_Copier_Report" in file3.name else file2
+            file_pivot = file3 if file_report != file3 else file2
+            file_mapping = file4 if "Mapping" in file4.name else None
+
+            # Ensure all necessary files are mapped
+            if not file_mapping:
+                st.error("UID Mapping File is not correctly uploaded or named.")
+            else:
+                # Load the data from the uploaded files
+                try:
+                    df_pivot = pd.read_excel(file_pivot, sheet_name="Product & Pricing Pivot Data", header=3)
+                    df_report = pd.read_excel(file_report, sheet_name="Product Details", header=5)
+                    df_report = df_report.iloc[1:].reset_index(drop=True)
+
+                except:
+                    df_pivot = pd.read_excel(file_pivot, sheet_name="Pivot Table Data", header=3)
+
+                df_mapping = pd.read_excel(file_mapping)
+                
+                #st.write(df_pivot)
+                # Merge file_mapping into file_pivot on the 'Product' column
+                df_pivot = pd.merge(df_pivot, df_mapping, on='Product', how='left')
+                df_report = pd.merge(df_report, df_mapping, on='Product', how='left')
+
+                merged_file = "merged_pivot.xlsx"
+                with pd.ExcelWriter(merged_file) as writer:
+                    df_pivot.to_excel(writer, sheet_name="Product Details", index=False)
+
+                merged_file2 = "merged_pivot.xlsx"
+                with pd.ExcelWriter(merged_file2) as writer:
+                    df_report.to_excel(writer, sheet_name="Product Details", index=False)
+
+            file_key = f"{country.lower()}_pivot.xlsx"
+            progress_bar = st.progress(0)
+            # Dynamically set keys based on the selected country
+            pivot_key = f"{country.lower()}_pivot.xlsx"
+            report_key = f"{country.lower()}_report.xlsx"
+            output_key = f"{country.lower()}_merged.xlsx"
+           
+            with st.spinner('Uploading files to S3...'):
+                with open(merged_file, "rb") as f:
+                    upload_file_to_s3(f, bucket_name, file_key, aws_access_key, aws_secret_key)
+                progress_bar.progress(50)
+                with open(merged_file2, "rb") as f:
+                    upload_file_to_s3(f, bucket_name, file_key, aws_access_key, aws_secret_key)
+                #upload_file_to_s3(file_pivot.getvalue(), bucket_name, pivot_key, aws_access_key, aws_secret_key)
+                progress_bar.progress(100)
+            st.success("✅**Files Uploaded to S3!**")
+            
+            # Call Lambda without spinner
+            response = call_lambda_merge_dcr(
+                bucket_name,
+                pivot_key,
+                report_key,
+                bucket_name,
+                output_key,
+                aws_access_key,  # Pass credentials
+                aws_secret_key
+            )
+
         else:
             # Determine which file is pivot and which is report based on a condition in their names
             file_report = file3 if "MFP_Copier_Report" in file3.name or "EU MFP" in file3.name else file2
