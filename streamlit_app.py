@@ -400,7 +400,7 @@ def display_dashboard():
     st.markdown(css, unsafe_allow_html=True)  # Inject custom CSS
 
     # Display an info message with the new red background
-    st.info("⚠️ Quicksight Does NOT Automatically Refresh When You Upload. It Refreshes Automatically Every Sunday Night. To Force a Refresh, go to Quicksights>Datasets>MFP-Copier>Refresh>Refresh Now")
+    st.info("⚠️ Quicksight Refreshes Automatically Every Monday at 1pm. To Force an Immediate Refresh, go to Quicksights>Datasets>MFP-Copier-Quicksight-Data>Refresh>Refresh Now")
     pp_report()  # Call the first section
     dcr_report()  # Call the second, currently blank section
 
