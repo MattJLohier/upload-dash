@@ -74,6 +74,18 @@ def display_login_form():
                 else:
                     st.error("Invalid username or password")
 
+        # Access the secrets
+        admin = st.secrets["credentials"]["admin"]
+        aws_access_key = st.secrets["aws"]["aws_access_key"]
+        aws_secret_key = st.secrets["aws"]["aws_secret_key"]
+        aws_region = st.secrets["aws"]["aws_region"]
+        bucket_name = st.secrets["aws"]["bucket_name"]
+
+        st.write("Admin:", admin)
+        st.write("AWS Access Key:", aws_access_key)
+        st.write("AWS Region:", aws_region)
+        st.write("Bucket Name:", bucket_name)
+
 
 def main():
     if 'logged_in' not in st.session_state:
