@@ -74,17 +74,7 @@ def display_login_form():
                 else:
                     st.error("Invalid username or password")
 
-        # Access the secrets
-        admin = st.secrets["credentials"]["admin"]
-        aws_access_key = st.secrets["aws"]["aws_access_key"]
-        aws_secret_key = st.secrets["aws"]["aws_secret_key"]
-        aws_region = st.secrets["aws"]["aws_region"]
-        bucket_name = st.secrets["aws"]["bucket_name"]
 
-        st.write("Admin:", admin)
-        st.write("AWS Access Key:", aws_access_key)
-        st.write("AWS Region:", aws_region)
-        st.write("Bucket Name:", bucket_name)
 
 
 def main():
@@ -199,9 +189,10 @@ def pp_report():
     
 
     if st.button("Process and Upload to S3", disabled=not (file1 and file2)):
-        bucket_name = st.secrets["bucket_name"]
-        aws_access_key = st.secrets["aws_access_key"]
-        aws_secret_key = st.secrets["aws_secret_key"]
+        aws_access_key = st.secrets["aws"]["aws_access_key"]
+        aws_secret_key = st.secrets["aws"]["aws_secret_key"]
+        aws_region = st.secrets["aws"]["aws_region"]
+        bucket_name = st.secrets["aws"]["bucket_name"]
 
         file_pivot = file1 if "PivotTable" in file1.name else file2
         file_report = file1 if file_pivot != file1 else file2
