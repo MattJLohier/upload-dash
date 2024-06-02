@@ -35,7 +35,14 @@ st.set_page_config(
 def sidebar():
     st.sidebar.image("https://i.postimg.cc/yx4SVyNZ/OB-Logomark-Primary-Colors-3.png", use_column_width=True)
     st.sidebar.markdown("---")
-    st.sidebar.markdown("![Alt Text](https://media.giphy.com/media/vFKqnCdLPNOKc/giphy.gif)")
+    st.sidebar.markdown(
+    """
+    <div style="text-align: center;">
+        <img src="https://media.giphy.com/media/vFKqnCdLPNOKc/giphy.gif" alt="Alt Text" style="width:100%; max-width:300px;">
+    </div>
+    """,
+    unsafe_allow_html=True
+)
 
 
 def login(username, password):
