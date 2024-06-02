@@ -35,6 +35,8 @@ st.set_page_config(
 def sidebar():
     st.sidebar.image("https://i.postimg.cc/yx4SVyNZ/OB-Logomark-Primary-Colors-3.png", use_column_width=True)
     st.sidebar.markdown("---")
+    st.markdown("![Alt Text](https://media.giphy.com/media/vFKqnCdLPNOKc/giphy.gif)")
+
 
 def login(username, password):
     try:
@@ -403,7 +405,6 @@ def display_dashboard():
     st.markdown(css, unsafe_allow_html=True)  # Inject custom CSS
 
     # Display an info message with the new red background
-    st.markdown("![Alt Text](https://media.giphy.com/media/vFKqnCdLPNOKc/giphy.gif)")
 
     st.info("⚠️ Quicksight Refreshes Automatically Every Monday at 1pm. To Force an Immediate Refresh, go to Quicksights>Datasets>MFP-Copier-Quicksight-Data>Refresh>Refresh Now")
     pp_report()  # Call the first section
