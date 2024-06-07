@@ -254,9 +254,9 @@ def dcr_report():
         process_button = st.button("Process and Upload to S3", key='key1', disabled=not (file3 and file2))
 
     if process_button:
-        bucket_name = st.secrets["bucket_name"]
-        aws_access_key = st.secrets["aws_access_key"]
-        aws_secret_key = st.secrets["aws_secret_key"]
+        bucket_name = st.secrets["aws"]["bucket_name"]
+        aws_access_key = st.secrets["aws"]["aws_access_key"]
+        aws_secret_key = st.secrets["aws"]["aws_secret_key"]
 
         if country in ["AUS", "MX", "BR"]:
             if file1:
