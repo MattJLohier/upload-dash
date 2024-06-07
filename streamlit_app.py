@@ -308,7 +308,6 @@ def dcr_report():
                 # Merge file_mapping into file_pivot on the 'Product' column
                 df_pivot = pd.merge(df_pivot, df_mapping, on='Product', how='left')
                 df_report = pd.merge(df_report, df_mapping, on='Product', how='left')
-                st.write(df_report)
                 merged_file = "merged_pivot.xlsx"
                 with pd.ExcelWriter(merged_file) as writer:
                     df_pivot.to_excel(writer, sheet_name="Product & Pricing Pivot Data", index=False)
