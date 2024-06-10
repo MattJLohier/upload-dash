@@ -265,26 +265,35 @@ def dcr_report():
                 if country == "AUS":
                     # AUS: Header is on the 4th row, adjust indexing accordingly.
                     df = pd.read_excel(file1, sheet_name='Pivot Table Data', header=3)
+                    df_opt = pd.read_excel(file1, sheet_name='Options Pricing', header=5, skiprows=[6])
+                    df_con = pd.read_excel(file1, sheet_name='Consumables Database', header=5, skiprows=[6])
 
                 if country == "MX":
                     # AUS: Header is on the 4th row, adjust indexing accordingly.
-                    df = pd.read_excel(file1, sheet_name='Pivot Table Data', header=3)
+                    df = pd.read_excel(file1, sheet_name='Product & Pricing Pivot Data', header=3)
+                    df_opt = pd.read_excel(file1, sheet_name='Options Pricing', header=5, skiprows=[6])
+                    df_con = pd.read_excel(file1, sheet_name='Consumables Database', header=5, skiprows=[6])
 
                 if country == "BR":
                     # AUS: Header is on the 4th row, adjust indexing accordingly.
-                    df = pd.read_excel(file1, sheet_name='Hardware Pricing', header=7)
+                    df = pd.read_excel(file1, sheet_name='Hardware Pricing', header=7, skiprows=[8])
+                    df_opt = pd.read_excel(file1, sheet_name='Options Pricing', header=5, skiprows=[6])
+                    df_con = pd.read_excel(file1, sheet_name='Consumables Database', header=5, skiprows=[6])
                     df = df.drop(df.index[0])
                 
-                processed_file = f"{country.lower()}_processed.xlsx"
-                with pd.ExcelWriter(processed_file) as writer:
-                    df.to_excel(writer, sheet_name="Processed Data", index=False)
+                # Save the dataframes as CSV files
+                df.to_csv(f"{country.lower()}_processed.csv", index=False)
+                df_opt.to_csv(f"{country.lower()}_options_pricing.csv", index=False)
+                df_con.to_csv(f"{country.lower()}_consumables_database.csv", index=False)
 
-                # Upload the modified file to S3
-                file_key = f"{country.lower()}_dcr.xlsx"
-                with st.spinner('Uploading modified file to S3...'):
-                    with open(processed_file, "rb") as f:
-                        upload_file_to_s3(f, bucket_name, file_key, aws_access_key, aws_secret_key)
-                st.success(f"✅**File Uploaded to S3!**")
+                 # Upload the modified files to S3
+                with st.spinner('Uploading modified files to S3...'):
+                    for csv_file in [f"{country.lower()}_processed.csv", f"{country.lower()}_options_pricing.csv", f"{country.lower()}_consumables_database.csv"]:
+                        file_key = csv_file
+                        with open(csv_file, "rb") as f:
+                            upload_file_to_s3(f, bucket_name, file_key, aws_access_key2, aws_secret_key2)
+                
+                st.success(f"✅**Files Uploaded to S3!**")
         
         elif country in ["US"]:
             file_report = file3 if "MFP_Copier_Report" in file3.name else file2
