@@ -86,10 +86,14 @@ def display_login_form():
 
 
 def log_update(username, file_name, s3_bucket, aws_access_key, aws_secret_key):
+    
+    aws_access_key2 = st.secrets["aws"]["aws_access_key2"]
+    aws_secret_key2 = st.secrets["aws"]["aws_secret_key2"]
+    
     s3 = boto3.client(
         's3',
-        aws_access_key_id=aws_access_key,
-        aws_secret_access_key=aws_secret_key
+        aws_access_key_id=aws_access_key2,
+        aws_secret_access_key=aws_secret_key2
     )
     
     log_file = "update_log.json"
