@@ -299,9 +299,9 @@ def dcr_report():
                 try:
                     df_pivot = pd.read_excel(file_pivot, sheet_name="Product & Pricing Pivot Data", header=3)
                     df_report = pd.read_excel(file_report, sheet_name="Product Details", header=5)
-                    df_opt = pd.read_excel(file_report, sheet_name='Options Pricing', header=4, skiprows=[5])
-                    df_con = pd.read_excel(file_report, sheet_name='Consumables Database', header=3, skiprows=[4])
-                    df_matrix = pd.read_excel(file_report, sheet_name='Dealer Program Matrix', header=3, skiprows=[4])
+                    df_opt = pd.read_excel(file_pivot, sheet_name='Options Pricing', header=4, skiprows=[5])
+                    df_con = pd.read_excel(file_pivot, sheet_name='Consumables Database', header=3, skiprows=[4])
+                    df_matrix = pd.read_excel(file_pivot, sheet_name='Dealer Program Matrix', header=3, skiprows=[4])
                     df_report = df_report.iloc[1:].reset_index(drop=True)
 
                 except:
