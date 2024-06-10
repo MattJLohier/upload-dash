@@ -85,6 +85,53 @@ def display_login_form():
 
 
 
+def log_update(username, file_name, s3_bucket, aws_access_key, aws_secret_key):
+    s3 = boto3.client(
+        's3',
+        aws_access_key_id=aws_access_key,
+        aws_secret_access_key=aws_secret_key
+    )
+    
+    log_file = "update_log.json"
+    
+    # Fetch existing log from S3
+    try:
+        obj = s3.get_object(Bucket=s3_bucket, Key=log_file)
+        log_data = json.loads(obj['Body'].read().decode('utf-8'))
+    except s3.exceptions.NoSuchKey:
+        log_data = []
+
+    # Append new log entry
+    log_entry = {
+        "user": username,
+        "file": file_name,
+        "timestamp": datetime.datetime.now(pytz.utc).isoformat()
+    }
+    log_data.append(log_entry)
+
+    # Save log back to S3
+    s3.put_object(Bucket=s3_bucket, Key=log_file, Body=json.dumps(log_data))
+
+
+def display_log(s3_bucket, aws_access_key, aws_secret_key):
+    s3 = boto3.client(
+        's3',
+        aws_access_key_id=aws_access_key,
+        aws_secret_access_key=aws_secret_key
+    )
+    
+    log_file = "update_log.json"
+    
+    # Fetch log from S3
+    try:
+        obj = s3.get_object(Bucket=s3_bucket, Key=log_file)
+        log_data = json.loads(obj['Body'].read().decode('utf-8'))
+    except s3.exceptions.NoSuchKey:
+        log_data = []
+
+    st.sidebar.markdown("## Update Log")
+    for entry in log_data:
+        st.sidebar.markdown(f"* {entry['user']} updated {entry['file']} on {entry['timestamp']}")
 
 def main():
     if 'logged_in' not in st.session_state:
@@ -95,7 +142,7 @@ def main():
             st.session_state['page'] = 'home'
         
         sidebar()
-
+        display_log(st.secrets["aws"]["bucket_name"], st.secrets["aws"]["aws_access_key"], st.secrets["aws"]["aws_secret_key"])
         # Redirect based on the selected page
         if st.session_state['page'] == 'home':
             display_dashboard()
@@ -140,6 +187,7 @@ def upload_file_to_s3(file_content, bucket_name, object_name, aws_access_key, aw
         if not results:
             return False, "None of the target sheets found in the file."
         
+        log_update(st.session_state['username'], object_name, bucket_name, aws_access_key, aws_secret_key)
         return True, "Uploaded files: " + ", ".join(results)
     except Exception as e:
         return False, f"Error uploading to S3: {str(e)}"
