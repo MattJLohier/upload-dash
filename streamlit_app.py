@@ -35,14 +35,14 @@ st.set_page_config(
 def sidebar():
     st.sidebar.image("https://i.postimg.cc/yx4SVyNZ/OB-Logomark-Primary-Colors-3.png", use_column_width=True)
     st.sidebar.markdown("---")
-    st.sidebar.markdown(
-    """
-    <div style="text-align: center;">
-        <img src="https://i.giphy.com/media/v1.Y2lkPTc5MGI3NjExMHF1bDFraGpsbmt1YWFxMXB0dG9jOXpnaW1xY3ZhM3kwY2NsZThodCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/rBszdmXbzglQUX7N4j/giphy.gif" alt="Alt Text" style="width:100%; max-width:300px;">
-    </div>
-    """,
-    unsafe_allow_html=True
-)
+#    st.sidebar.markdown(
+#    """
+#    <div style="text-align: center;">
+#        <img src="https://i.giphy.com/media/v1.Y2lkPTc5MGI3NjExMHF1bDFraGpsbmt1YWFxMXB0dG9jOXpnaW1xY3ZhM3kwY2NsZThodCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/rBszdmXbzglQUX7N4j/giphy.gif" alt="Alt Text" style="width:100%; max-width:300px;">
+#    </div>
+#    """,
+#    unsafe_allow_html=True
+#)
 
 
 def login(username, password):
