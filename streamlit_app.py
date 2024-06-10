@@ -297,6 +297,9 @@ def dcr_report():
                 try:
                     df_pivot = pd.read_excel(file_pivot, sheet_name="Product & Pricing Pivot Data", header=3)
                     df_report = pd.read_excel(file_report, sheet_name="Product Details", header=5)
+                    df_opt = pd.read_excel(file_report, sheet_name='Options Pricing', header=4, skiprows=[5])
+                    df_con = pd.read_excel(file_report, sheet_name='Consumables Database', header=3, skiprows=[4])
+                    df_matrix = pd.read_excel(file_report, sheet_name='Dealer Program Matrix', header=3, skiprows=[4])
                     df_report = df_report.iloc[1:].reset_index(drop=True)
 
                 except:
@@ -316,6 +319,14 @@ def dcr_report():
                 with pd.ExcelWriter(merged_file2) as writer:
                     df_report.to_excel(writer, sheet_name="Product Details", index=False)
 
+                con_filename = f"{country.lower()}_con.csv"
+                opt_filename = f"{country.lower()}_opt.csv"
+                matrix_filename = f"{country.lower()}_matrix.csv"
+                
+                df_con.to_csv(con_filename, index=False)
+                df_opt.to_csv(opt_filename, index=False)
+                df_matrix.to_csv(matrix_filename, index=False)
+
             file_key = f"{country.lower()}_pivot.xlsx"
             file_key2 = f"{country.lower()}_report.xlsx"
             progress_bar = st.progress(0)
@@ -332,6 +343,14 @@ def dcr_report():
                     upload_file_to_s3(f, bucket_name, file_key2, aws_access_key, aws_secret_key)
                 #upload_file_to_s3(file_pivot.getvalue(), bucket_name, pivot_key, aws_access_key, aws_secret_key)
                 progress_bar.progress(100)
+            
+                # Upload CSV files to S3 with dynamic names
+                with open(con_filename, "rb") as f:
+                    upload_file_to_s3(f, bucket_name, con_filename, aws_access_key, aws_secret_key)
+                with open(opt_filename, "rb") as f:
+                    upload_file_to_s3(f, bucket_name, opt_filename, aws_access_key, aws_secret_key)
+                with open(matrix_filename, "rb") as f:
+                    upload_file_to_s3(f, bucket_name, matrix_filename, aws_access_key, aws_secret_key)
             st.success("✅**Files Uploaded to S3!**")
             
             # Call Lambda without spinner
