@@ -305,7 +305,7 @@ def dcr_report():
                     df_report = df_report.iloc[1:].reset_index(drop=True)
 
                 except:
-                    df_pivot = pd.read_excel(file_pivot, sheet_name="Pivot Table Data", header=3)
+                    pass
 
                 df_mapping = pd.read_excel(file_mapping)
                 
