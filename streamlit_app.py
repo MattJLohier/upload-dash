@@ -257,6 +257,8 @@ def dcr_report():
         bucket_name = st.secrets["aws"]["bucket_name"]
         aws_access_key = st.secrets["aws"]["aws_access_key"]
         aws_secret_key = st.secrets["aws"]["aws_secret_key"]
+        aws_access_key2 = st.secrets["aws"]["aws_access_key2"]
+        aws_secret_key2 = st.secrets["aws"]["aws_secret_key2"]
 
         if country in ["AUS", "MX", "BR"]:
             if file1:
@@ -346,11 +348,11 @@ def dcr_report():
             
                 # Upload CSV files to S3 with dynamic names
                 with open(con_filename, "rb") as f:
-                    upload_file_to_s3(f, bucket_name, con_filename, aws_access_key, aws_secret_key)
+                    upload_file_to_s3(f, bucket_name, con_filename, aws_access_key2, aws_secret_key2)
                 with open(opt_filename, "rb") as f:
-                    upload_file_to_s3(f, bucket_name, opt_filename, aws_access_key, aws_secret_key)
+                    upload_file_to_s3(f, bucket_name, opt_filename, aws_access_key2, aws_secret_key2)
                 with open(matrix_filename, "rb") as f:
-                    upload_file_to_s3(f, bucket_name, matrix_filename, aws_access_key, aws_secret_key)
+                    upload_file_to_s3(f, bucket_name, matrix_filename, aws_access_key2, aws_secret_key2)
             st.success("✅**Files Uploaded to S3!**")
             
             # Call Lambda without spinner
