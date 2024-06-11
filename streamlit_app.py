@@ -253,24 +253,46 @@ def main():
             unsafe_allow_html=True
         )
 
+        # Add "View Logins" button for admin
+        if st.session_state['username'] == 'admin':
+            if st.sidebar.button("View Logins"):
+                st.session_state['page'] = 'view_logins'
+
         display_log(st.secrets["aws"]["bucket_name"], st.secrets["aws"]["aws_access_key"], st.secrets["aws"]["aws_secret_key"])
 
 
         # Redirect based on the selected page
         if st.session_state['page'] == 'home':
             display_dashboard()
-        elif st.session_state['page'] == 'certifications':
-            display_certifications_page()  # Renamed for clarity
-        elif st.session_state['page'] == 'placements':
-            display_placements_page()  # Renamed for clarity
+        elif st.session_state['page'] == 'view_logins':
+            display_logins_page()
     else:
         display_login_form()
 
 
-def page1():
-    st.title("Page 1")
-    st.write("Welcome to Page 1")
-    sidebar()
+def display_logins_page():
+    st.title("Login Information")
+    aws_access_key = st.secrets["aws"]["aws_access_key2"]
+    aws_secret_key = st.secrets["aws"]["aws_secret_key2"]
+    log_bucket = st.secrets["aws"]["bucket_name"]
+    s3 = boto3.client(
+        's3',
+        aws_access_key_id=aws_access_key,
+        aws_secret_access_key=aws_secret_key
+    )
+
+    log_file = "login_log.json"
+
+    # Fetch existing log from S3
+    try:
+        obj = s3.get_object(Bucket=log_bucket, Key=log_file)
+        log_data = json.loads(obj['Body'].read().decode('utf-8'))
+        for user, logins in log_data.items():
+            st.markdown(f"**{user}**")
+            for login_time in logins:
+                st.markdown(f"<p style='color:darkgrey; font-style:italic;'>{login_time}</p>", unsafe_allow_html=True)
+    except s3.exceptions.NoSuchKey:
+        st.error("No login log found.")
 
 # Function to upload a file to S3
 def upload_file_to_s3(file_content, bucket_name, object_name, aws_access_key, aws_secret_key):
