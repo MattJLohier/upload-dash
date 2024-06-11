@@ -182,7 +182,7 @@ def main():
                 # Add other profile details or components as needed
                 if st.button("Close", key='close_modal'):
                     st.session_state['show_modal'] = False
-                    st.rerun
+                    st.rerun()
         
         display_log(st.secrets["aws"]["bucket_name"], st.secrets["aws"]["aws_access_key"], st.secrets["aws"]["aws_secret_key"])
 
