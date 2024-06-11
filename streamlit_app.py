@@ -304,11 +304,16 @@ def display_logins_page():
 
         df = pd.DataFrame(data, columns=users)
 
-        # Display the table using Streamlit
+        # Display the table using Streamlit without index
         st.write(df.to_html(index=False), unsafe_allow_html=True)
 
     except s3.exceptions.NoSuchKey:
         st.error("No login log found.")
+
+    # Add a "Back" button
+    if st.button("Back"):
+        st.session_state['page'] = 'home'
+        st.experimental_rerun()
 
 # Function to upload a file to S3
 def upload_file_to_s3(file_content, bucket_name, object_name, aws_access_key, aws_secret_key):
