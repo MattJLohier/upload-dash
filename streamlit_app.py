@@ -36,7 +36,7 @@ st.markdown(
     """
     <style>
     .stButton button {
-        font-size: 20px;  /* Change this value to adjust the font size */
+        font-size: 40px;  /* Change this value to adjust the font size */
     }
     </style>
     """,
