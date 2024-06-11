@@ -53,6 +53,7 @@ def login(username, password):
         input_hashed_password = hashlib.sha256(password.encode()).hexdigest()
         # Check if the username exists and if the hashed password matches
         if user_passwords.get(username) == input_hashed_password:
+            st.session_state['username'] = username  # Set the username in session state
             return True
     except KeyError as e:
         st.error(f"KeyError: {e} - Check your secrets.toml configuration.")
