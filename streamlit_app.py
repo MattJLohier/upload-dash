@@ -69,7 +69,7 @@ def login(username, password):
             st.session_state['username'] = username  # Set the username in session state
             st.session_state['logged_in'] = True  # Ensure logged_in is also set
             st.session_state['emoji'] = user_emojis.get(username, "")  # Set the emoji in session state
-            update_last_login(username)  # Update the last login time
+            update_login_log(username)  # Update the login log
             return True
     except KeyError as e:
         st.error(f"KeyError: {e} - Check your secrets.toml configuration.")
@@ -77,9 +77,9 @@ def login(username, password):
     return False
     
 
-def update_last_login(username):
-    aws_access_key = st.secrets["aws"]["aws_access_key2"]
-    aws_secret_key = st.secrets["aws"]["aws_secret_key2"]
+def update_login_log(username):
+    aws_access_key = st.secrets["aws"]["aws_access_key"]
+    aws_secret_key = st.secrets["aws"]["aws_secret_key"]
     log_bucket = st.secrets["aws"]["bucket_name"]
     s3 = boto3.client(
         's3',
@@ -87,7 +87,7 @@ def update_last_login(username):
         aws_secret_access_key=aws_secret_key
     )
     
-    log_file = "last_login.json"
+    log_file = "login_log.json"
     
     # Fetch existing log from S3
     try:
@@ -95,18 +95,22 @@ def update_last_login(username):
         log_data = json.loads(obj['Body'].read().decode('utf-8'))
     except s3.exceptions.NoSuchKey:
         log_data = {}
-    
-    # Update the login time for the username
+
+    # Ensure the username has an entry
+    if username not in log_data:
+        log_data[username] = []
+
+    # Append new login time for the username
     pst_tz = pytz.timezone('US/Pacific')
     timestamp = datetime.datetime.now(pytz.utc).astimezone(pst_tz).strftime('%-m/%-d/%y, %-I:%M%p')
-    log_data[username] = timestamp
+    log_data[username].append(timestamp)
 
     # Save log back to S3
     s3.put_object(Bucket=log_bucket, Key=log_file, Body=json.dumps(log_data))
 
 def get_last_login(username):
-    aws_access_key = st.secrets["aws"]["aws_access_key2"]
-    aws_secret_key = st.secrets["aws"]["aws_secret_key2"]
+    aws_access_key = st.secrets["aws"]["aws_access_key"]
+    aws_secret_key = st.secrets["aws"]["aws_secret_key"]
     log_bucket = st.secrets["aws"]["bucket_name"]
     s3 = boto3.client(
         's3',
@@ -114,13 +118,16 @@ def get_last_login(username):
         aws_secret_access_key=aws_secret_key
     )
     
-    log_file = "last_login.json"
+    log_file = "login_log.json"
     
     # Fetch existing log from S3
     try:
         obj = s3.get_object(Bucket=log_bucket, Key=log_file)
         log_data = json.loads(obj['Body'].read().decode('utf-8'))
-        return log_data.get(username, "Never")
+        if username in log_data and log_data[username]:
+            return log_data[username][-1]
+        else:
+            return "Never"
     except s3.exceptions.NoSuchKey:
         return "Never"
 
