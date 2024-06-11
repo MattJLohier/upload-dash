@@ -317,8 +317,7 @@ def dcr_report():
         file2 = st.file_uploader("Upload Specs; EU TCO or US P&P ", type=["xlsx"], key='second_file_uploader')
         # Using HTML to change the color of the text
         # Using HTML to change only the "UID Mapping File" text to purple without margin or padding
-        st.markdown('<label><span style="color: purple; margin: 0; padding: 0;">Upload the UID Mapping File</span></label>', unsafe_allow_html=True)
-        file4 = st.file_uploader("", type=["xlsx"])
+        file4 = st.file_uploader("Upload the UID Mapping File", type=["xlsx"])
         process_button = st.button("Process and Upload to S3", key='key1', disabled=not (file3 and file2))
 
     if process_button:
