@@ -180,8 +180,7 @@ def main():
             with st.container():
                 st.write("Profile details go here.")
                 # Add other profile details or components as needed
-                close_clicked = st.button("Close", key='close_modal')
-                if close_clicked:
+                if st.button("Close", key='close_modal'):
                     st.session_state['show_modal'] = False
         
         display_log(st.secrets["aws"]["bucket_name"], st.secrets["aws"]["aws_access_key"], st.secrets["aws"]["aws_secret_key"])
