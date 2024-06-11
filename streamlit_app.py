@@ -162,8 +162,23 @@ def main():
             st.session_state['page'] = 'home'
         
         sidebar()
+
+        # Create two columns to display the "Logged in as" text and profile button next to each other
+        col1, col2 = st.sidebar.columns([1, 2])
+        col1.markdown("### Logged in as:")
+        if col2.button(f"👤 {st.session_state['username']}", use_container_width=True):
+            st.session_state['show_profile'] = True
+        
+        if st.session_state['show_profile']:
+            with st.sidebar.expander("Profile"):
+                st.write(f"Username: {st.session_state['username']}")
+                st.write("Additional profile information can go here.")
+                if st.button("Close"):
+                    st.session_state['show_profile'] = False
+
+        ## YOLO 
         # Display the profile button with username
-        st.sidebar.button(f"👤 {st.session_state['username']}", use_container_width=True)
+        if st.sidebar.button(f"👤 {st.session_state['username']}", use_container_width=True)
         display_log(st.secrets["aws"]["bucket_name"], st.secrets["aws"]["aws_access_key"], st.secrets["aws"]["aws_secret_key"])
         
         # Redirect based on the selected page
