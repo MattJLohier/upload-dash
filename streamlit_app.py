@@ -35,14 +35,9 @@ st.set_page_config(
 st.markdown(
     """
     <style>
-    div[data-testid="stSidebar"] p, 
-    div[data-testid="stSidebar"] ol, 
-    div[data-testid="stSidebar"] ul, 
-    div[data-testid="stSidebar"] dl {
-        margin: 0px 0px 1rem;
-        padding: 0px;
+    /* Increase the font size of p tags in buttons within the sidebar */
+    div[data-testid="stSidebar"] .stButton p {
         font-size: 20px;  /* Adjust this value as needed */
-        font-weight: 400;
     }
     </style>
     """,
