@@ -110,10 +110,12 @@ def log_update(username, file_name):
         log_data = []
 
     # Append new log entry
+    pst_tz = pytz.timezone('US/Pacific')
+    timestamp = datetime.datetime.now(pytz.utc).astimezone(pst_tz).strftime('%-m/%-d/%y, %-I:%M%p')
     log_entry = {
         "user": username,
         "file": file_name,
-        "timestamp": datetime.datetime.now(pytz.utc).isoformat()
+        "timestamp": timestamp
     }
     log_data.append(log_entry)
 
