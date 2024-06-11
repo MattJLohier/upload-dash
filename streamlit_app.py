@@ -49,12 +49,14 @@ def login(username, password):
     try:
         # Access the dictionary of usernames and hashed passwords directly
         user_passwords = st.secrets["credentials"]
+        user_emojis = st.secrets["emojis"]
         # Convert the input password to its hashed version
         input_hashed_password = hashlib.sha256(password.encode()).hexdigest()
         # Check if the username exists and if the hashed password matches
         if user_passwords.get(username) == input_hashed_password:
             st.session_state['username'] = username  # Set the username in session state
             st.session_state['logged_in'] = True  # Ensure logged_in is also set
+            st.session_state['emoji'] = user_emojis.get(username, "")  # Set the emoji in session state
             return True
     except KeyError as e:
         st.error(f"KeyError: {e} - Check your secrets.toml configuration.")
@@ -169,7 +171,7 @@ def main():
 
         ## YOLO 
         # Display the profile button with username
-        if st.sidebar.button(f"👤 {st.session_state['username']}", use_container_width=True):
+        if st.sidebar.button(f"{st.session_state.get('emoji', '')} {st.session_state['username']}", use_container_width=True):
             st.session_state['show_modal'] = True
         
         display_log(st.secrets["aws"]["bucket_name"], st.secrets["aws"]["aws_access_key"], st.secrets["aws"]["aws_secret_key"])
