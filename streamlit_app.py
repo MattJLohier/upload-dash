@@ -96,7 +96,9 @@ def log_update(username, file_name):
     )
     
     log_file = "update_log.json"
-    
+    st.write("Updating log...")
+    st.write(f"Username: {username}")
+    st.write(f"File Name: {file_name}")
     # Fetch existing log from S3
     try:
         obj = s3.get_object(Bucket=log_bucket, Key=log_file)
