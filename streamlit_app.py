@@ -54,6 +54,7 @@ def login(username, password):
         # Check if the username exists and if the hashed password matches
         if user_passwords.get(username) == input_hashed_password:
             st.session_state['username'] = username  # Set the username in session state
+            st.session_state['logged_in'] = True  # Ensure logged_in is also set
             return True
     except KeyError as e:
         st.error(f"KeyError: {e} - Check your secrets.toml configuration.")
@@ -146,6 +147,9 @@ def main():
 
     if 'username' not in st.session_state:
         st.session_state['username'] = None
+
+    st.write(f"Logged in: {st.session_state['logged_in']}")
+    st.write(f"Username: {st.session_state['username']}")
 
     if st.session_state['logged_in']:
         if 'page' not in st.session_state:
