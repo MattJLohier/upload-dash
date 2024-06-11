@@ -85,7 +85,7 @@ def display_login_form():
 
 
 
-def log_update(username, file_name, s3_bucket, aws_access_key, aws_secret_key):
+def log_update(username, file_name):
     aws_access_key2 = st.secrets["aws"]["aws_access_key2"]
     aws_secret_key2 = st.secrets["aws"]["aws_secret_key2"]
     log_bucket = st.secrets["aws"]["bucket_name"]
@@ -190,7 +190,7 @@ def upload_file_to_s3(file_content, bucket_name, object_name, aws_access_key, aw
         if not results:
             return False, "None of the target sheets found in the file."
         
-        log_update(st.session_state['username'], object_name, bucket_name, aws_access_key, aws_secret_key)
+        log_update(st.session_state['username'], object_name)
         return True, "Uploaded files: " + ", ".join(results)
     except Exception as e:
         return False, f"Error uploading to S3: {str(e)}"
