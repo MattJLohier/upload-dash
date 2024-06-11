@@ -17,7 +17,7 @@ import warnings
 
 
 # URL of the image you want to use as the page icon
-icon_url = "https://i.postimg.cc/G2syP8W6/OB-Primary-Logo-01-Full-Color.png"
+icon_url = "https://i.postimg.cc/yx4SVyNZ/OB-Logomark-Primary-Colors-3.png"
 
 # Download the image
 response = requests.get(icon_url)
@@ -33,7 +33,7 @@ st.set_page_config(
 
 
 def sidebar():
-    st.sidebar.image("https://i.postimg.cc/yx4SVyNZ/OB-Logomark-Primary-Colors-3.png", width=100)
+    st.sidebar.image("https://i.postimg.cc/G2syP8W6/OB-Primary-Logo-01-Full-Color.png", width=100)
     st.sidebar.markdown("---")
 #    st.sidebar.markdown(
 #    """
