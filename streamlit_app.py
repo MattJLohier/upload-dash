@@ -354,7 +354,7 @@ def dcr_report():
                         with open(csv_file, "rb") as f:
                             upload_file_to_s3(f, bucket_name, file_key, aws_access_key2, aws_secret_key2)
                 
-                log_update(st.session_state['username'], country)
+                log_update(st.session_state['username'], f"{country} DCR)
                 st.success(f"✅**Files Uploaded to S3!**")
         
         elif country in ["US"]:
