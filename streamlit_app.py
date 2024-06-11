@@ -178,8 +178,9 @@ def main():
             with st.expander("Profile", expanded=True):
                 st.write("Profile details go here.")
                 # Add other profile details or components as needed
-                if st.button("Close"):
+                if st.button("Close", key='close_modal'):
                     st.session_state['show_modal'] = False
+                    st.experimental_rerun()
 
         ## YOLO 
         # Display the profile button with username
