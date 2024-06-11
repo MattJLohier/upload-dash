@@ -166,37 +166,6 @@ def main():
         
         sidebar()
 
-        # Display the "Logged in as" text and profile button next to each other
-        profile_html = f"""
-        <div style="display: flex; align-items: center;">
-            <span style="font-size: 1.2em;">👤 {st.session_state['username']}</span>
-            <button id="profileBtn" style="margin-left: 10px; padding: 5px 10px; font-size: 1em; cursor: pointer;">
-                Profile
-            </button>
-        </div>
-        <div id="profileModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-            background-color: rgba(0, 0, 0, 0.5); z-index: 10; overflow: auto;">
-            <div style="background-color: white; margin: 10% auto; padding: 20px; border: 1px solid black; 
-                width: 80%; max-width: 600px; text-align: center;">
-                <h3>Profile</h3>
-                <p>Username: {st.session_state['username']}</p>
-                <button id="closeBtn" style="margin-top: 10px; padding: 5px 10px; font-size: 1em; cursor: pointer;">
-                    Close
-                </button>
-            </div>
-        </div>
-        <script>
-            document.getElementById('profileBtn').onclick = function() {{
-                document.getElementById('profileModal').style.display = 'block';
-            }}
-
-            document.getElementById('closeBtn').onclick = function() {{
-                document.getElementById('profileModal').style.display = 'none';
-            }}
-        </script>
-        """
-        st.sidebar.markdown(profile_html, unsafe_allow_html=True)
-
         ## YOLO 
         # Display the profile button with username
         st.sidebar.button(f"👤 {st.session_state['username']}", use_container_width=True)
