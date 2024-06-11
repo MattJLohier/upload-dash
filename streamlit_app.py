@@ -172,10 +172,6 @@ def main():
         ## YOLO 
         # Display the profile button with username
 
-        ## YOLO 
-        # Display the profile button with larger text and emoji
-        large_button_with_emoji(f"{st.session_state.get('emoji', '')} {st.session_state['username']}", key="profile_button")
-
         if st.sidebar.button(f"{st.session_state.get('emoji', '')} {st.session_state['username']}", use_container_width=True):
             st.session_state['show_modal'] = True
         
