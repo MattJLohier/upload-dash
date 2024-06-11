@@ -37,7 +37,7 @@ st.markdown(
     <style>
     /* Increase the font size of p tags in buttons within the sidebar */
     div[data-testid="stSidebar"] .stButton p {
-        font-size: 20px;  /* Adjust this value as needed */
+        font-size: 30px;  /* Adjust this value as needed */
     }
     </style>
     """,
