@@ -88,6 +88,9 @@ def display_login_form():
 
 
 def log_update(username, file_name):
+    if username == "admin":
+        return
+    
     aws_access_key2 = st.secrets["aws"]["aws_access_key2"]
     aws_secret_key2 = st.secrets["aws"]["aws_secret_key2"]
     log_bucket = st.secrets["aws"]["bucket_name"]
