@@ -272,8 +272,8 @@ def main():
 
 def display_logins_page():
     st.title("Login Information")
-    aws_access_key = st.secrets["aws"]["aws_access_key2"]
-    aws_secret_key = st.secrets["aws"]["aws_secret_key2"]
+    aws_access_key = st.secrets["aws"]["aws_access_key"]
+    aws_secret_key = st.secrets["aws"]["aws_secret_key"]
     log_bucket = st.secrets["aws"]["bucket_name"]
     s3 = boto3.client(
         's3',
@@ -287,10 +287,26 @@ def display_logins_page():
     try:
         obj = s3.get_object(Bucket=log_bucket, Key=log_file)
         log_data = json.loads(obj['Body'].read().decode('utf-8'))
-        for user, logins in log_data.items():
-            st.markdown(f"**{user}**")
-            for login_time in logins:
-                st.markdown(f"<p style='color:darkgrey; font-style:italic;'>{login_time}</p>", unsafe_allow_html=True)
+
+        # Organize the data into a table format
+        users = list(log_data.keys())
+        max_logins = max(len(logins) for logins in log_data.values())
+        data = []
+
+        for i in range(max_logins):
+            row = []
+            for user in users:
+                if i < len(log_data[user]):
+                    row.append(log_data[user][i])
+                else:
+                    row.append("")
+            data.append(row)
+
+        df = pd.DataFrame(data, columns=users)
+
+        # Display the table using Streamlit
+        st.table(df)
+
     except s3.exceptions.NoSuchKey:
         st.error("No login log found.")
 
