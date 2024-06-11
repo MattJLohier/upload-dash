@@ -79,8 +79,8 @@ def login(username, password):
     
 
 def update_login_log(username):
-    aws_access_key = st.secrets["aws"]["aws_access_key"]
-    aws_secret_key = st.secrets["aws"]["aws_secret_key"]
+    aws_access_key = st.secrets["aws"]["aws_access_key2"]
+    aws_secret_key = st.secrets["aws"]["aws_secret_key2"]
     log_bucket = st.secrets["aws"]["bucket_name"]
     s3 = boto3.client(
         's3',
