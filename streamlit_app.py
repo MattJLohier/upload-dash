@@ -148,9 +148,6 @@ def main():
     if 'username' not in st.session_state:
         st.session_state['username'] = None
 
-    st.write(f"Logged in: {st.session_state['logged_in']}")
-    st.write(f"Username: {st.session_state['username']}")
-
     if st.session_state['logged_in']:
         if 'page' not in st.session_state:
             st.session_state['page'] = 'home'
