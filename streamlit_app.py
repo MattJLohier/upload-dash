@@ -138,10 +138,17 @@ def display_log(s3_bucket, aws_access_key, aws_secret_key):
         log_data = json.loads(obj['Body'].read().decode('utf-8'))
     except s3.exceptions.NoSuchKey:
         log_data = []
+    
+    log_data.reverse()
 
     st.sidebar.markdown("## Update Log")
     for entry in log_data:
-        st.sidebar.markdown(f"* {entry['user']} updated {entry['file']} on {entry['timestamp']}")
+        st.sidebar.markdown(
+            f'<span style="color:orange;">{entry["user"]}</span> updated '
+            f'<span style="color:teal;">{entry["file"]}</span> on '
+            f'<span style="color:lightpurple;">{entry["timestamp"]}</span>',
+            unsafe_allow_html=True
+        )
 
 def main():
     if 'logged_in' not in st.session_state:
