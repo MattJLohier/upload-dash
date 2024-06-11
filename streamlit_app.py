@@ -160,9 +160,6 @@ def main():
     if 'show_profile' not in st.session_state:
         st.session_state['show_profile'] = False
 
-    if 'show_modal' not in st.session_state:
-        st.session_state['show_modal'] = False
-
     if st.session_state['logged_in']:
         if 'page' not in st.session_state:
             st.session_state['page'] = 'home'
@@ -174,14 +171,6 @@ def main():
         # Display the profile button with username
         if st.sidebar.button(f"👤 {st.session_state['username']}", use_container_width=True):
             st.session_state['show_modal'] = True
-
-        # Show modal when the button is clicked
-        if st.session_state['show_modal']:
-            with st.sidebar:
-                st.write("Profile details go here.")
-                # Add other profile details or components as needed
-                if st.button("Close", key='close_modal'):
-                    st.session_state['show_modal'] = False
         
         display_log(st.secrets["aws"]["bucket_name"], st.secrets["aws"]["aws_access_key"], st.secrets["aws"]["aws_secret_key"])
 
