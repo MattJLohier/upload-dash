@@ -170,6 +170,8 @@ def main():
         sidebar()
 
 
+        ## YOLO 
+        # Display the profile button with username
         if st.sidebar.button(f"👤 {st.session_state['username']}", use_container_width=True):
             st.session_state['show_modal'] = True
 
@@ -178,14 +180,13 @@ def main():
             with st.expander("Profile", expanded=True):
                 st.write("Profile details go here.")
                 # Add other profile details or components as needed
-                if st.button("Close", key='close_modal'):
+                close_clicked = st.button("Close", key='close_modal')
+                if close_clicked:
                     st.session_state['show_modal'] = False
-                    st.experimental_rerun()
-
-        ## YOLO 
-        # Display the profile button with username
-        display_log(st.secrets["aws"]["bucket_name"], st.secrets["aws"]["aws_access_key"], st.secrets["aws"]["aws_secret_key"])
         
+        display_log(st.secrets["aws"]["bucket_name"], st.secrets["aws"]["aws_access_key"], st.secrets["aws"]["aws_secret_key"])
+
+
         # Redirect based on the selected page
         if st.session_state['page'] == 'home':
             display_dashboard()
