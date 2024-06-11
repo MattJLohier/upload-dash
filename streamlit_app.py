@@ -315,7 +315,9 @@ def dcr_report():
     else:
         file3 = st.file_uploader("Upload A DCR File", type=["xlsx"], key='first_file_uploader')
         file2 = st.file_uploader("Upload Specs; EU TCO or US P&P ", type=["xlsx"], key='second_file_uploader')
-        file4 = st.file_uploader("Upload the UID Mapping File", type=["xlsx"])
+        # Using HTML to change the color of the text
+        st.markdown('<p style="color: purple;">Upload the UID Mapping File</p>', unsafe_allow_html=True)
+        file4 = st.file_uploader("", type=["xlsx"])
         process_button = st.button("Process and Upload to S3", key='key1', disabled=not (file3 and file2))
 
     if process_button:
