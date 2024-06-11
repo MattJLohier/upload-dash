@@ -163,6 +163,11 @@ def main():
         
         sidebar()
         display_log(st.secrets["aws"]["bucket_name"], st.secrets["aws"]["aws_access_key"], st.secrets["aws"]["aws_secret_key"])
+        
+        # Display the profile button with username
+        st.sidebar.markdown(f"### Logged in as:")
+        st.sidebar.button(f"👤 {st.session_state['username']}")
+        
         # Redirect based on the selected page
         if st.session_state['page'] == 'home':
             display_dashboard()
