@@ -146,7 +146,7 @@ def display_log(s3_bucket, aws_access_key, aws_secret_key):
         st.sidebar.markdown(
             f'<span style="color:orange; font-weight:bold;">{entry["user"]}</span> updated '
             f'<span style="color:teal; font-weight:bold;">{entry["file"]}</span> on '
-            f'<span style="color:#4682B4; font-weight:bold;">{entry["timestamp"]}</span>',
+            f'<span style="color:#AA336A; font-weight:bold;">{entry["timestamp"]}</span>',
             unsafe_allow_html=True
         )
 
