@@ -248,7 +248,10 @@ def main():
         
         # Show last login time
         last_login_time = st.session_state.get('last_login', "Never")
-        st.sidebar.markdown(f"**Last Login:** {last_login_time}")
+        st.sidebar.markdown(
+            f"<p style='color:darkgrey; font-style:italic;'>**Last Login:** {last_login_time}</p>",
+            unsafe_allow_html=True
+        )
 
         display_log(st.secrets["aws"]["bucket_name"], st.secrets["aws"]["aws_access_key"], st.secrets["aws"]["aws_secret_key"])
 
