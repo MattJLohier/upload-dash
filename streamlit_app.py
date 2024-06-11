@@ -177,12 +177,11 @@ def main():
 
         # Show modal when the button is clicked
         if st.session_state['show_modal']:
-            with st.container():
+            with st.sidebar.expander("Profile", expanded=True):
                 st.write("Profile details go here.")
                 # Add other profile details or components as needed
                 if st.button("Close", key='close_modal'):
                     st.session_state['show_modal'] = False
-                    st.rerun()
         
         display_log(st.secrets["aws"]["bucket_name"], st.secrets["aws"]["aws_access_key"], st.secrets["aws"]["aws_secret_key"])
 
