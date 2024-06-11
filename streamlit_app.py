@@ -157,6 +157,9 @@ def main():
     if 'username' not in st.session_state:
         st.session_state['username'] = None
 
+    if 'show_profile' not in st.session_state:
+        st.session_state['show_profile'] = False
+
     if st.session_state['logged_in']:
         if 'page' not in st.session_state:
             st.session_state['page'] = 'home'
