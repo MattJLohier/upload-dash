@@ -255,7 +255,7 @@ def main():
 
         # Add "View Logins" button for admin
         if st.session_state['username'] == 'admin':
-            if st.sidebar.button("View Logins", use_container_width=True):
+            if st.sidebar.button("🔒 View Logins", use_container_width=True):
                 st.session_state['page'] = 'view_logins'
 
         display_log(st.secrets["aws"]["bucket_name"], st.secrets["aws"]["aws_access_key"], st.secrets["aws"]["aws_secret_key"])
