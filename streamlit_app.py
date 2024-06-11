@@ -35,9 +35,9 @@ st.set_page_config(
 st.markdown(
     """
     <style>
-    /* Increase the font size of buttons in the sidebar */
-    section[data-testid="stSidebar"] div.stButton button {
-        font-size: 40px;  /* Adjust this value as needed */
+    /* Increase the font size of p tags within specific div in the sidebar */
+    section[data-testid="stSidebar"] div[data-testid="stMarkdownContainer"] p {
+        font-size: 20px;  /* Adjust this value as needed */
     }
     </style>
     """,
