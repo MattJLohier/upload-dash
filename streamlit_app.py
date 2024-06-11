@@ -169,6 +169,10 @@ def main():
         
         sidebar()
 
+
+        if st.sidebar.button(f"👤 {st.session_state['username']}", use_container_width=True):
+            st.session_state['show_modal'] = True
+
         # Show modal when the button is clicked
         if st.session_state['show_modal']:
             with st.expander("Profile", expanded=True):
@@ -179,7 +183,6 @@ def main():
 
         ## YOLO 
         # Display the profile button with username
-        st.sidebar.button(f"👤 {st.session_state['username']}", use_container_width=True)
         display_log(st.secrets["aws"]["bucket_name"], st.secrets["aws"]["aws_access_key"], st.secrets["aws"]["aws_secret_key"])
         
         # Redirect based on the selected page
