@@ -169,7 +169,7 @@ def main():
         # Create two columns to display the "Logged in as" text and profile button next to each other
         col1, col2 = st.sidebar.columns([1, 2])
         col1.markdown("### Logged in as:")
-        if col2.button(f"👤 {st.session_state['username']}", use_container_width=True):
+        if col2.button(f"👤 {st.session_state['username']}", use_container_width=True, key='lambda'):
             st.session_state['show_profile'] = True
         
         if st.session_state['show_profile']:
