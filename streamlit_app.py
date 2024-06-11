@@ -31,6 +31,17 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
+# Custom CSS for sidebar button font size
+st.markdown(
+    """
+    <style>
+    .stButton button {
+        font-size: 20px;  /* Change this value to adjust the font size */
+    }
+    </style>
+    """,
+    unsafe_allow_html=True
+)
 
 def sidebar():
     st.sidebar.image("https://i.postimg.cc/G2syP8W6/OB-Primary-Logo-01-Full-Color.png", use_column_width=True)
@@ -193,34 +204,6 @@ def page1():
     st.title("Page 1")
     st.write("Welcome to Page 1")
     sidebar()
-
-def large_button_with_emoji(label, key=None):
-    custom_button_css = f"""
-    <style>
-        .custom-button {{
-            font-size: 24px;  /* Adjust the size as needed */
-            padding: 10px;
-            width: 100%;
-            text-align: left;
-            border: none;
-            background-color: transparent;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-        }}
-        .custom-button:hover {{
-            background-color: #f0f0f0;
-        }}
-        .custom-button span {{
-            margin-left: 10px;
-        }}
-    </style>
-    <button class="custom-button" onclick="document.querySelector('button[data-testid=\'{key}\']').click()">
-        {label}
-    </button>
-    """
-    st.sidebar.markdown(custom_button_css, unsafe_allow_html=True)
-    st.sidebar.button(label, key=key)
 
 # Function to upload a file to S3
 def upload_file_to_s3(file_content, bucket_name, object_name, aws_access_key, aws_secret_key):
