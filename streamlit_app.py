@@ -500,7 +500,7 @@ def display_dashboard():
     css = """
     <style>
     div.stAlert {
-        background-color: #ff6600;
+        background-color: lightblue;
     }
     </style>
     """
