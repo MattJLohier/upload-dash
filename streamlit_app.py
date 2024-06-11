@@ -175,10 +175,11 @@ def main():
                 Profile
             </button>
         </div>
-        <div id="profileModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background-color: rgba(0,0,0,0.5); padding-top: 60px; z-index: 1000;">
-            <div style="background-color: white; margin: 5% auto; padding: 20px; border: 1px solid #888; width: 80%;">
-                <h2>Profile</h2>
+        <div id="profileModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background-color: rgba(0, 0, 0, 0.5); z-index: 10; overflow: auto;">
+            <div style="background-color: white; margin: 10% auto; padding: 20px; border: 1px solid black; 
+                width: 80%; max-width: 600px; text-align: center;">
+                <h3>Profile</h3>
                 <p>Username: {st.session_state['username']}</p>
                 <button onclick="document.getElementById('profileModal').style.display='none'" 
                         style="margin-top: 10px; padding: 5px 10px; font-size: 1em; cursor: pointer;">
@@ -186,6 +187,18 @@ def main():
                 </button>
             </div>
         </div>
+        <script>
+            function showModal() {{
+                document.getElementById('profileModal').style.display = 'block';
+            }}
+
+            function closeModal() {{
+                document.getElementById('profileModal').style.display = 'none';
+            }}
+
+            document.querySelector('button[onclick*="block"]').onclick = showModal;
+            document.querySelector('button[onclick*="none"]').onclick = closeModal;
+        </script>
         """
         st.sidebar.markdown(profile_html, unsafe_allow_html=True)
 
