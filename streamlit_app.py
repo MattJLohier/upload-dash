@@ -305,7 +305,7 @@ def display_logins_page():
         df = pd.DataFrame(data, columns=users)
 
         # Display the table using Streamlit
-        st.dataframe(df, use_container_width=True)
+        st.write(df.to_html(index=False), unsafe_allow_html=True)
 
     except s3.exceptions.NoSuchKey:
         st.error("No login log found.")
