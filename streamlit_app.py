@@ -206,8 +206,7 @@ def upload_file_to_s3(file_content, bucket_name, object_name, aws_access_key, aw
 
         if not results:
             return False, "None of the target sheets found in the file."
-        
-        log_update(st.session_state['username'], object_name)
+
         return True, "Uploaded files: " + ", ".join(results)
     except Exception as e:
         return False, f"Error uploading to S3: {str(e)}"
@@ -287,6 +286,7 @@ def pp_report():
             upload_file_to_s3(file_report.getvalue(), bucket_name, report_key, aws_access_key, aws_secret_key)
             progress_bar.progress(100)  # Update progress bar to 100%
 
+        log_update(st.session_state['username'], "US P&P")
         st.success("✅**Files Uploaded to S3!**")
 
         # Call Lambda without spinner
@@ -431,6 +431,7 @@ def dcr_report():
                     upload_file_to_s3(f, bucket_name, opt_filename, aws_access_key2, aws_secret_key2)
                 with open(matrix_filename, "rb") as f:
                     upload_file_to_s3(f, bucket_name, matrix_filename, aws_access_key2, aws_secret_key2)
+            log_update(st.session_state['username'], f"{country} DCR")
             st.success("✅**Files Uploaded to S3!**")
             
             # Call Lambda without spinner
