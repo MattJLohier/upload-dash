@@ -160,11 +160,22 @@ def main():
     if 'show_profile' not in st.session_state:
         st.session_state['show_profile'] = False
 
+    if 'show_modal' not in st.session_state:
+        st.session_state['show_modal'] = False
+
     if st.session_state['logged_in']:
         if 'page' not in st.session_state:
             st.session_state['page'] = 'home'
         
         sidebar()
+
+        # Show modal when the button is clicked
+        if st.session_state['show_modal']:
+            with st.expander("Profile", expanded=True):
+                st.write("Profile details go here.")
+                # Add other profile details or components as needed
+                if st.button("Close"):
+                    st.session_state['show_modal'] = False
 
         ## YOLO 
         # Display the profile button with username
