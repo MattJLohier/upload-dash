@@ -36,7 +36,7 @@ st.markdown(
     """
     <style>
     /* Increase the font size of buttons in the sidebar */
-    .sidebar .stButton button {
+    div[data-testid="stSidebar"] .stButton button {
         font-size: 20px;  /* Adjust this value as needed */
     }
     </style>
