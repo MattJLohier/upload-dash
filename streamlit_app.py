@@ -66,9 +66,11 @@ def login(username, password):
         input_hashed_password = hashlib.sha256(password.encode()).hexdigest()
         # Check if the username exists and if the hashed password matches
         if user_passwords.get(username) == input_hashed_password:
+            last_login = get_last_login(username)  # Fetch the last login time
             st.session_state['username'] = username  # Set the username in session state
             st.session_state['logged_in'] = True  # Ensure logged_in is also set
             st.session_state['emoji'] = user_emojis.get(username, "")  # Set the emoji in session state
+            st.session_state['last_login'] = last_login  # Set the last login time in session state
             with st.spinner('Logging in...'):
                 update_login_log(username)  # Update the login log
             return True
@@ -245,7 +247,7 @@ def main():
             st.session_state['show_modal'] = True
         
         # Show last login time
-        last_login_time = get_last_login(st.session_state['username'])
+        last_login_time = st.session_state.get('last_login', "Never")
         st.sidebar.markdown(f"**Last Login:** {last_login_time}")
 
         display_log(st.secrets["aws"]["bucket_name"], st.secrets["aws"]["aws_access_key"], st.secrets["aws"]["aws_secret_key"])
