@@ -171,6 +171,11 @@ def main():
 
         ## YOLO 
         # Display the profile button with username
+
+        ## YOLO 
+        # Display the profile button with larger text and emoji
+        large_button_with_emoji(f"{st.session_state.get('emoji', '')} {st.session_state['username']}", key="profile_button")
+
         if st.sidebar.button(f"{st.session_state.get('emoji', '')} {st.session_state['username']}", use_container_width=True):
             st.session_state['show_modal'] = True
         
@@ -193,7 +198,33 @@ def page1():
     st.write("Welcome to Page 1")
     sidebar()
 
-
+def large_button_with_emoji(label, key=None):
+    custom_button_css = f"""
+    <style>
+        .custom-button {{
+            font-size: 24px;  /* Adjust the size as needed */
+            padding: 10px;
+            width: 100%;
+            text-align: left;
+            border: none;
+            background-color: transparent;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+        }}
+        .custom-button:hover {{
+            background-color: #f0f0f0;
+        }}
+        .custom-button span {{
+            margin-left: 10px;
+        }}
+    </style>
+    <button class="custom-button" onclick="document.querySelector('button[data-testid=\'{key}\']').click()">
+        {label}
+    </button>
+    """
+    st.sidebar.markdown(custom_button_css, unsafe_allow_html=True)
+    st.sidebar.button(label, key=key)
 
 # Function to upload a file to S3
 def upload_file_to_s3(file_content, bucket_name, object_name, aws_access_key, aws_secret_key):
