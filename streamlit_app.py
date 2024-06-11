@@ -17,7 +17,7 @@ import warnings
 
 
 # URL of the image you want to use as the page icon
-icon_url = "https://i.postimg.cc/yx4SVyNZ/OB-Logomark-Primary-Colors-3.png"
+icon_url = "https://i.postimg.cc/G2syP8W6/OB-Primary-Logo-01-Full-Color.png"
 
 # Download the image
 response = requests.get(icon_url)
