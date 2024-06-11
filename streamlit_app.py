@@ -164,7 +164,7 @@ def main():
         sidebar()
         # Create two columns to display the "Logged in as" text and profile button next to each other
         col1, col2 = st.sidebar.columns([1, 2])
-        col1.markdown("### Logged in as:")
+        col1.markdown("## Logged in as:")
         col2.button(f"👤 {st.session_state['username']}")
         display_log(st.secrets["aws"]["bucket_name"], st.secrets["aws"]["aws_access_key"], st.secrets["aws"]["aws_secret_key"])
         
