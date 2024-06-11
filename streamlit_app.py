@@ -88,7 +88,7 @@ def display_login_form():
 def log_update(username, file_name, s3_bucket, aws_access_key, aws_secret_key):
     aws_access_key2 = st.secrets["aws"]["aws_access_key2"]
     aws_secret_key2 = st.secrets["aws"]["aws_secret_key2"]
-    
+    log_bucket = st.secrets["aws"]["bucket_name"]
     s3 = boto3.client(
         's3',
         aws_access_key_id=aws_access_key2,
@@ -99,7 +99,7 @@ def log_update(username, file_name, s3_bucket, aws_access_key, aws_secret_key):
     
     # Fetch existing log from S3
     try:
-        obj = s3.get_object(Bucket=s3_bucket, Key=log_file)
+        obj = s3.get_object(Bucket=log_bucket, Key=log_file)
         log_data = json.loads(obj['Body'].read().decode('utf-8'))
     except s3.exceptions.NoSuchKey:
         log_data = []
@@ -113,7 +113,7 @@ def log_update(username, file_name, s3_bucket, aws_access_key, aws_secret_key):
     log_data.append(log_entry)
 
     # Save log back to S3
-    s3.put_object(Bucket=s3_bucket, Key=log_file, Body=json.dumps(log_data))
+    s3.put_object(Bucket=log_bucket, Key=log_file, Body=json.dumps(log_data))
 
 
 def display_log(s3_bucket, aws_access_key, aws_secret_key):
