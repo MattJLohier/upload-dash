@@ -33,7 +33,7 @@ st.set_page_config(
 
 
 def sidebar():
-    st.sidebar.image("https://i.postimg.cc/G2syP8W6/OB-Primary-Logo-01-Full-Color.png", width=100)
+    st.sidebar.image("https://i.postimg.cc/G2syP8W6/OB-Primary-Logo-01-Full-Color.png", use_column_width=True)
     st.sidebar.markdown("---")
 #    st.sidebar.markdown(
 #    """
