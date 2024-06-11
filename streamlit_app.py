@@ -177,7 +177,7 @@ def main():
 
         # Show modal when the button is clicked
         if st.session_state['show_modal']:
-            with st.sidebar.expander("Profile", expanded=True):
+            with st.sidebar:
                 st.write("Profile details go here.")
                 # Add other profile details or components as needed
                 if st.button("Close", key='close_modal'):
