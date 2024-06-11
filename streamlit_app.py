@@ -69,12 +69,61 @@ def login(username, password):
             st.session_state['username'] = username  # Set the username in session state
             st.session_state['logged_in'] = True  # Ensure logged_in is also set
             st.session_state['emoji'] = user_emojis.get(username, "")  # Set the emoji in session state
+            update_last_login(username)  # Update the last login time
             return True
     except KeyError as e:
         st.error(f"KeyError: {e} - Check your secrets.toml configuration.")
         return False
     return False
     
+
+def update_last_login(username):
+    aws_access_key = st.secrets["aws"]["aws_access_key2"]
+    aws_secret_key = st.secrets["aws"]["aws_secret_key2"]
+    log_bucket = st.secrets["aws"]["bucket_name"]
+    s3 = boto3.client(
+        's3',
+        aws_access_key_id=aws_access_key,
+        aws_secret_access_key=aws_secret_key
+    )
+    
+    log_file = "last_login.json"
+    
+    # Fetch existing log from S3
+    try:
+        obj = s3.get_object(Bucket=log_bucket, Key=log_file)
+        log_data = json.loads(obj['Body'].read().decode('utf-8'))
+    except s3.exceptions.NoSuchKey:
+        log_data = {}
+    
+    # Update the login time for the username
+    pst_tz = pytz.timezone('US/Pacific')
+    timestamp = datetime.datetime.now(pytz.utc).astimezone(pst_tz).strftime('%-m/%-d/%y, %-I:%M%p')
+    log_data[username] = timestamp
+
+    # Save log back to S3
+    s3.put_object(Bucket=log_bucket, Key=log_file, Body=json.dumps(log_data))
+
+def get_last_login(username):
+    aws_access_key = st.secrets["aws"]["aws_access_key2"]
+    aws_secret_key = st.secrets["aws"]["aws_secret_key2"]
+    log_bucket = st.secrets["aws"]["bucket_name"]
+    s3 = boto3.client(
+        's3',
+        aws_access_key_id=aws_access_key,
+        aws_secret_access_key=aws_secret_key
+    )
+    
+    log_file = "last_login.json"
+    
+    # Fetch existing log from S3
+    try:
+        obj = s3.get_object(Bucket=log_bucket, Key=log_file)
+        log_data = json.loads(obj['Body'].read().decode('utf-8'))
+        return log_data.get(username, "Never")
+    except s3.exceptions.NoSuchKey:
+        return "Never"
+
 
 def display_login_form():
     # Create three columns
@@ -187,6 +236,10 @@ def main():
         if st.sidebar.button(f"{st.session_state.get('emoji', '')} {st.session_state['username']}", use_container_width=True):
             st.session_state['show_modal'] = True
         
+        # Show last login time
+        last_login_time = get_last_login(st.session_state['username'])
+        st.sidebar.markdown(f"**Last Login:** {last_login_time}")
+
         display_log(st.secrets["aws"]["bucket_name"], st.secrets["aws"]["aws_access_key"], st.secrets["aws"]["aws_secret_key"])
 
 
