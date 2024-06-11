@@ -164,7 +164,7 @@ def main():
         sidebar()
         # Display the profile button with username
         st.sidebar.markdown(f"## Logged in as:")
-        st.sidebar.button(f"👤 {st.session_state['username']}")
+        st.sidebar.button(f"👤 {st.session_state['username']}", use_container_width=True)
         display_log(st.secrets["aws"]["bucket_name"], st.secrets["aws"]["aws_access_key"], st.secrets["aws"]["aws_secret_key"])
         
         # Redirect based on the selected page
