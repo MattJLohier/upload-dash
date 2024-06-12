@@ -640,6 +640,7 @@ def display_dashboard():
     <style>
     div.stAlert {
         background-color: teal;
+        color: white;
     }
     </style>
     """
