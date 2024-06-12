@@ -46,7 +46,7 @@ st.markdown(
 )
 
 
-light_mode_css = """
+default_mode_css = """
     <style>
     body {
         background-color: #ffffff;
@@ -55,21 +55,22 @@ light_mode_css = """
     </style>
     """
 
-dark_mode_css = """
+red_mode_css = """
     <style>
     body {
-        background-color: #000000;
+        background-color: #ff0000;
         color: #ffffff;
     }
     </style>
     """
 
+# JavaScript to handle the theme switching
 theme_switcher_js = """
     <script>
     function setTheme(theme) {
         localStorage.setItem('theme', theme);
-        if (theme === 'dark') {
-            document.body.style.backgroundColor = '#000000';
+        if (theme === 'red') {
+            document.body.style.backgroundColor = '#ff0000';
             document.body.style.color = '#ffffff';
         } else {
             document.body.style.backgroundColor = '#ffffff';
@@ -78,7 +79,7 @@ theme_switcher_js = """
     }
 
     function getTheme() {
-        return localStorage.getItem('theme') || 'light';
+        return localStorage.getItem('theme') || 'default';
     }
 
     document.addEventListener('DOMContentLoaded', (event) => {
@@ -88,13 +89,15 @@ theme_switcher_js = """
     });
     </script>
 """
+
+
 def toggle_mode():
     if 'mode' not in st.session_state:
-        st.session_state['mode'] = 'light'
-    if st.session_state['mode'] == 'light':
-        st.session_state['mode'] = 'dark'
+        st.session_state['mode'] = 'default'
+    if st.session_state['mode'] == 'default':
+        st.session_state['mode'] = 'red'
     else:
-        st.session_state['mode'] = 'light'
+        st.session_state['mode'] = 'default'
     st.experimental_rerun()
 
 def sidebar():
