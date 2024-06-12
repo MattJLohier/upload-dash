@@ -45,9 +45,53 @@ st.markdown(
     unsafe_allow_html=True
 )
 
+theme_switcher_js = """
+    <script>
+    function setTheme(theme) {
+        localStorage.setItem('theme', theme);
+        if (theme === 'dark') {
+            document.body.style.backgroundColor = '#000000';
+            document.body.style.color = '#ffffff';
+        } else {
+            document.body.style.backgroundColor = '#ffffff';
+            document.body.style.color = '#000000';
+        }
+    }
+
+    function getTheme() {
+        return localStorage.getItem('theme') || 'light';
+    }
+
+    document.addEventListener('DOMContentLoaded', (event) => {
+        const theme = getTheme();
+        setTheme(theme);
+        window.dispatchEvent(new Event('themeChange'));
+    });
+    </script>
+"""
+def toggle_mode():
+    if 'mode' not in st.session_state:
+        st.session_state['mode'] = 'light'
+    if st.session_state['mode'] == 'light':
+        st.session_state['mode'] = 'dark'
+    else:
+        st.session_state['mode'] = 'light'
+    st.experimental_rerun()
+
 def sidebar():
     st.sidebar.image("https://i.postimg.cc/G2syP8W6/OB-Primary-Logo-01-Full-Color.png", use_column_width=True)
     st.sidebar.markdown("---")
+    # Add a button to toggle between dark mode and light mode
+    if st.sidebar.button('Toggle Dark/Light Mode'):
+        toggle_mode()
+
+    # Apply the CSS based on the selected mode
+    if st.session_state.get('mode', 'light') == 'light':
+        st.markdown(light_mode_css, unsafe_allow_html=True)
+        st.markdown(theme_switcher_js, unsafe_allow_html=True)
+    else:
+        st.markdown(dark_mode_css, unsafe_allow_html=True)
+        st.markdown(theme_switcher_js, unsafe_allow_html=True)
 #    st.sidebar.markdown(
 #    """
 #    <div style="text-align: center;">
@@ -233,6 +277,9 @@ def main():
 
     if 'show_profile' not in st.session_state:
         st.session_state['show_profile'] = False
+
+    if 'mode' not in st.session_state:
+        st.session_state['mode'] = 'light'  # Default mode is light
 
     if st.session_state['logged_in']:
         if 'page' not in st.session_state:
