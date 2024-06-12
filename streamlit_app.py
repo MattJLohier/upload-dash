@@ -290,6 +290,15 @@ def display_log(s3_bucket, aws_access_key, aws_secret_key):
         )
 
 def main():
+    if 'mode' not in st.session_state:
+        st.session_state['mode'] = 'default'  # Default mode is default
+
+    # Apply the CSS based on the selected mode
+    if st.session_state['mode'] == 'default':
+        st.markdown(default_mode_css, unsafe_allow_html=True)
+    else:
+        st.markdown(red_mode_css, unsafe_allow_html=True)
+
     if 'logged_in' not in st.session_state:
         st.session_state['logged_in'] = False
 
@@ -298,9 +307,6 @@ def main():
 
     if 'show_profile' not in st.session_state:
         st.session_state['show_profile'] = False
-
-    if 'mode' not in st.session_state:
-        st.session_state['mode'] = 'default'  # Default mode is light
 
     if st.session_state['logged_in']:
         if 'page' not in st.session_state:
