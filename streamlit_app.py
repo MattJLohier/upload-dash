@@ -23,32 +23,6 @@ icon_url = "https://i.postimg.cc/yx4SVyNZ/OB-Logomark-Primary-Colors-3.png"
 response = requests.get(icon_url)
 image = Image.open(BytesIO(response.content))
 
-# CSS styles for dark mode and light mode
-light_mode_css = """
-    <style>
-    body {
-        background-color: #ffffff;
-        color: #000000;
-    }
-    </style>
-    """
-
-dark_mode_css = """
-    <style>
-    body {
-        background-color: #000000;
-        color: #ffffff;
-    }
-    </style>
-    """
-
-def toggle_mode():
-    if 'mode' not in st.session_state:
-        st.session_state['mode'] = 'light'
-    if st.session_state['mode'] == 'light':
-        st.session_state['mode'] = 'dark'
-    else:
-        st.session_state['mode'] = 'light'
 
 # Set the Streamlit page configuration with the custom icon
 st.set_page_config(
@@ -74,17 +48,6 @@ st.markdown(
 def sidebar():
     st.sidebar.image("https://i.postimg.cc/G2syP8W6/OB-Primary-Logo-01-Full-Color.png", use_column_width=True)
     st.sidebar.markdown("---")
-
-    # Add a button to toggle between dark mode and light mode
-    if st.sidebar.button('Toggle Dark/Light Mode'):
-        toggle_mode()
-
-    # Apply the CSS based on the selected mode
-    if st.session_state.get('mode', 'light') == 'light':
-        st.markdown(light_mode_css, unsafe_allow_html=True)
-    else:
-        st.markdown(dark_mode_css, unsafe_allow_html=True)
-
 #    st.sidebar.markdown(
 #    """
 #    <div style="text-align: center;">
@@ -270,9 +233,6 @@ def main():
 
     if 'show_profile' not in st.session_state:
         st.session_state['show_profile'] = False
-
-    if 'mode' not in st.session_state:
-        st.session_state['mode'] = 'light'  # Default mode is light
 
     if st.session_state['logged_in']:
         if 'page' not in st.session_state:
