@@ -46,51 +46,6 @@ st.markdown(
 )
 
 
-default_mode_css = """
-    <style>
-    body {
-        background-color: #ffffff;
-        color: #000000;
-    }
-    </style>
-    """
-
-red_mode_css = """
-    <style>
-    body {
-        background-color: #ff0000;
-        color: #ffffff;
-    }
-    </style>
-    """
-
-# JavaScript to handle the theme switching
-theme_switcher_js = """
-    <script>
-    function setTheme(theme) {
-        localStorage.setItem('theme', theme);
-        if (theme === 'red') {
-            document.body.style.backgroundColor = '#ff0000';
-            document.body.style.color = '#ffffff';
-        } else {
-            document.body.style.backgroundColor = '#ffffff';
-            document.body.style.color = '#000000';
-        }
-    }
-
-    function getTheme() {
-        return localStorage.getItem('theme') || 'default';
-    }
-
-    document.addEventListener('DOMContentLoaded', (event) => {
-        const theme = getTheme();
-        setTheme(theme);
-        window.dispatchEvent(new Event('themeChange'));
-    });
-    </script>
-"""
-
-
 def toggle_mode():
     if 'mode' not in st.session_state:
         st.session_state['mode'] = 'default'
@@ -105,14 +60,7 @@ def sidebar():
     st.sidebar.markdown("---")
     # Add a button to toggle between dark mode and light mode
     # Add a button to toggle between default mode and red mode
-    if st.sidebar.button('Toggle Red/Default Mode'):
-        toggle_mode()
 
-    # Apply the CSS based on the selected mode
-    if st.session_state.get('mode', 'default') == 'default':
-        st.markdown(default_mode_css, unsafe_allow_html=True)
-    else:
-        st.markdown(red_mode_css, unsafe_allow_html=True)
 #    st.sidebar.markdown(
 #    """
 #    <div style="text-align: center;">
@@ -290,15 +238,6 @@ def display_log(s3_bucket, aws_access_key, aws_secret_key):
         )
 
 def main():
-    if 'mode' not in st.session_state:
-        st.session_state['mode'] = 'default'  # Default mode is default
-
-    # Apply the CSS based on the selected mode
-    if st.session_state['mode'] == 'default':
-        st.markdown(default_mode_css, unsafe_allow_html=True)
-    else:
-        st.markdown(red_mode_css, unsafe_allow_html=True)
-
     if 'logged_in' not in st.session_state:
         st.session_state['logged_in'] = False
 
@@ -313,7 +252,6 @@ def main():
             st.session_state['page'] = 'home'
         
         sidebar()
-
 
         ## YOLO 
         # Display the profile button with username
