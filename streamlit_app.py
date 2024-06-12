@@ -45,6 +45,25 @@ st.markdown(
     unsafe_allow_html=True
 )
 
+
+light_mode_css = """
+    <style>
+    body {
+        background-color: #ffffff;
+        color: #000000;
+    }
+    </style>
+    """
+
+dark_mode_css = """
+    <style>
+    body {
+        background-color: #000000;
+        color: #ffffff;
+    }
+    </style>
+    """
+
 theme_switcher_js = """
     <script>
     function setTheme(theme) {
