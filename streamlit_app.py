@@ -104,16 +104,16 @@ def sidebar():
     st.sidebar.image("https://i.postimg.cc/G2syP8W6/OB-Primary-Logo-01-Full-Color.png", use_column_width=True)
     st.sidebar.markdown("---")
     # Add a button to toggle between dark mode and light mode
-    if st.sidebar.button('Toggle Dark/Light Mode'):
+    if st.sidebar.button('Toggle Red/Default Mode'):
         toggle_mode()
 
     # Apply the CSS based on the selected mode
-    if st.session_state.get('mode', 'light') == 'light':
-        st.markdown(light_mode_css, unsafe_allow_html=True)
-        st.markdown(theme_switcher_js, unsafe_allow_html=True)
+    if st.session_state.get('mode', 'default') == 'default':
+        st.markdown(default_mode_css, unsafe_allow_html=True)
     else:
-        st.markdown(dark_mode_css, unsafe_allow_html=True)
-        st.markdown(theme_switcher_js, unsafe_allow_html=True)
+        st.markdown(red_mode_css, unsafe_allow_html=True)
+    
+    st.markdown(theme_switcher_js, unsafe_allow_html=True)
 #    st.sidebar.markdown(
 #    """
 #    <div style="text-align: center;">
@@ -301,7 +301,7 @@ def main():
         st.session_state['show_profile'] = False
 
     if 'mode' not in st.session_state:
-        st.session_state['mode'] = 'light'  # Default mode is light
+        st.session_state['mode'] = 'default'  # Default mode is light
 
     if st.session_state['logged_in']:
         if 'page' not in st.session_state:
