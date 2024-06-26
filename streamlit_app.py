@@ -329,7 +329,7 @@ def display_logins_page():
         st.experimental_rerun()
 
 # Function to upload a file to S3
-def upload_file_to_s3(file_content, bucket_name, object_name, aws_access_key, aws_secret_key):
+def upload_file_to_s3(file_content, bucket_name, object_name, aws_access_key, aws_secret_key, folder_path=None):
     # Define the specific sheets to check
     target_sheets = ["Product & Pricing Pivot Data", "Product Details"]
     
@@ -339,6 +339,9 @@ def upload_file_to_s3(file_content, bucket_name, object_name, aws_access_key, aw
         aws_secret_access_key=aws_secret_key
     )
     
+    if folder_path:
+        object_name = f"{folder_path}/{object_name}".replace('//', '/')
+
     try:
         # Upload the original Excel file
         s3.put_object(Bucket=bucket_name, Key=object_name, Body=file_content)
@@ -349,7 +352,7 @@ def upload_file_to_s3(file_content, bucket_name, object_name, aws_access_key, aw
         for sheet_name in workbook.sheet_names:
             if sheet_name in target_sheets:
                 df = pd.read_excel(workbook, sheet_name=sheet_name)
-                results.append(f"Successfully uploaded {tsv_object_name}")
+                results.append(f"Successfully uploaded {sheet_name}")
 
         if not results:
             return False, "None of the target sheets found in the file."
@@ -477,6 +480,8 @@ def dcr_report():
         aws_access_key2 = st.secrets["aws"]["aws_access_key2"]
         aws_secret_key2 = st.secrets["aws"]["aws_secret_key2"]
 
+        folder_path = f"{country.lower()}/" if country in ["AUS", "MX", "BR", "US", "CA", "DE", "ES", "FR", "IT", "UK"] else None
+
         if country in ["AUS", "MX", "BR"]:
             if file1:
                 if country == "AUS":
@@ -506,7 +511,7 @@ def dcr_report():
                  # Upload the modified files to S3
                 with st.spinner('Uploading modified files to S3...'):
                     for csv_file in [f"{country.lower()}_processed.csv", f"{country.lower()}_options_pricing.csv", f"{country.lower()}_consumables_database.csv"]:
-                        file_key = csv_file
+                        file_key = f"{folder_path}{csv_file}"
                         with open(csv_file, "rb") as f:
                             upload_file_to_s3(f, bucket_name, file_key, aws_access_key2, aws_secret_key2)
                 
@@ -560,9 +565,9 @@ def dcr_report():
             file_key2 = f"{country.lower()}_report.xlsx"
             progress_bar = st.progress(0)
             # Dynamically set keys based on the selected country
-            pivot_key = "us_pivot.xlsx"
-            report_key = "us_report.xlsx"
-            output_key = "us_merged.xlsx"
+            pivot_key = f"{folder_path}pivot.xlsx"
+            report_key = f"{folder_path}report.xlsx"
+            output_key = f"{folder_path}merged.xlsx"
            
             with st.spinner('Uploading files to S3...'):
                 with open(merged_file, "rb") as f:
