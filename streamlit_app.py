@@ -330,7 +330,6 @@ def display_logins_page():
 
 # Function to upload a file to S3
 def upload_file_to_s3(file_content, bucket_name, object_name, aws_access_key, aws_secret_key, folder_path=None):
-    # Define the specific sheets to check
     target_sheets = ["Product & Pricing Pivot Data", "Product Details"]
     
     s3 = boto3.client(
@@ -454,22 +453,18 @@ def pp_report():
 def dcr_report():
     st.subheader("Update DCR Quicksight 🌎")
 
-    # Dropdown menu for selecting a country with a unique key
     country = st.selectbox(
         "Select Your Country",
         ["US", "AUS", "BR", "CA", "DE", "ES", "FR", "IT", "MX", "UK"],
         key='country_select'
     )
 
-    # Conditional display of upload boxes based on country selection
     if country in ["AUS", "MX", "BR"]:
         file1 = st.file_uploader("Upload the file", type=["xlsx"], key='single_file_uploader')
         process_button = st.button("Process and Upload to S3", key='key2', disabled=file1 is None)
     else:
         file3 = st.file_uploader("Upload A DCR File", type=["xlsx"], key='first_file_uploader')
         file2 = st.file_uploader("Upload Specs; EU TCO or US P&P ", type=["xlsx"], key='second_file_uploader')
-        # Using HTML to change the color of the text
-        # Using HTML to change only the "UID Mapping File" text to purple without margin or padding
         file4 = st.file_uploader("Upload the UID Mapping File", type=["xlsx"])
         process_button = st.button("Process and Upload to S3", key='key1', disabled=not (file3 and file2))
 
@@ -484,67 +479,53 @@ def dcr_report():
 
         if country in ["AUS", "MX", "BR"]:
             if file1:
+                df, df_opt, df_con = None, None, None
                 if country == "AUS":
-                    # AUS: Header is on the 4th row, adjust indexing accordingly.
                     df = pd.read_excel(file1, sheet_name='Pivot Table Data', header=3)
                     df_opt = pd.read_excel(file1, sheet_name='Options Pricing', header=5, skiprows=[6])
                     df_con = pd.read_excel(file1, sheet_name='Consumables Database', header=5, skiprows=[6])
-
-                if country == "MX":
-                    # AUS: Header is on the 4th row, adjust indexing accordingly.
+                elif country == "MX":
                     df = pd.read_excel(file1, sheet_name='Product & Pricing Pivot Data', header=3)
                     df_opt = pd.read_excel(file1, sheet_name='Options Pricing', header=5, skiprows=[6])
                     df_con = pd.read_excel(file1, sheet_name='Consumables Database', header=5, skiprows=[6])
-
-                if country == "BR":
-                    # AUS: Header is on the 4th row, adjust indexing accordingly.
+                elif country == "BR":
                     df = pd.read_excel(file1, sheet_name='Hardware Pricing', header=7, skiprows=[8])
                     df_opt = pd.read_excel(file1, sheet_name='Options Pricing', header=5, skiprows=[6])
                     df_con = pd.read_excel(file1, sheet_name='Consumables Database', header=5, skiprows=[6])
                     df = df.drop(df.index[0])
-                
-                # Save the dataframes as CSV files
+
                 df.to_csv(f"{country.lower()}_processed.csv", index=False)
                 df_opt.to_csv(f"{country.lower()}_options_pricing.csv", index=False)
                 df_con.to_csv(f"{country.lower()}_consumables_database.csv", index=False)
 
-                 # Upload the modified files to S3
                 with st.spinner('Uploading modified files to S3...'):
                     for csv_file in [f"{country.lower()}_processed.csv", f"{country.lower()}_options_pricing.csv", f"{country.lower()}_consumables_database.csv"]:
-                        file_key = f"{folder_path}{csv_file}"
+                        file_key = f"{folder_path}{csv_file}" if folder_path else csv_file
                         with open(csv_file, "rb") as f:
-                            upload_file_to_s3(f, bucket_name, file_key, aws_access_key2, aws_secret_key2)
-                
+                            upload_file_to_s3(f.read(), bucket_name, file_key, aws_access_key2, aws_secret_key2)
+
                 log_update(st.session_state['username'], f"{country} DCR")
                 st.success(f"✅**Files Uploaded to S3!**")
-        
-        elif country in ["US"]:
+
+        elif country == "US":
             file_report = file3 if "MFP_Copier_Report" in file3.name else file2
             file_pivot = file3 if file_report != file3 else file2
             file_mapping = file4 if "Mapping" in file4.name else None
 
-            # Ensure all necessary files are mapped
             if not file_mapping:
                 st.error("UID Mapping File is not correctly uploaded or named.")
             else:
-                # Load the data from the uploaded files
-                try:
-                    df_pivot = pd.read_excel(file_pivot, sheet_name="Product & Pricing Pivot Data", header=3)
-                    df_report = pd.read_excel(file_report, sheet_name="Product Details", header=5)
-                    df_opt = pd.read_excel(file_pivot, sheet_name='Options Pricing', header=4, skiprows=[5])
-                    df_con = pd.read_excel(file_pivot, sheet_name='Consumables Database', header=3, skiprows=[4])
-                    df_matrix = pd.read_excel(file_pivot, sheet_name='Dealer Program Matrix', header=3, skiprows=[4])
-                    df_report = df_report.iloc[1:].reset_index(drop=True)
-
-                except:
-                    pass
-
+                df_pivot = pd.read_excel(file_pivot, sheet_name="Product & Pricing Pivot Data", header=3)
+                df_report = pd.read_excel(file_report, sheet_name="Product Details", header=5)
+                df_opt = pd.read_excel(file_pivot, sheet_name='Options Pricing', header=4, skiprows=[5])
+                df_con = pd.read_excel(file_pivot, sheet_name='Consumables Database', header=3, skiprows=[4])
+                df_matrix = pd.read_excel(file_pivot, sheet_name='Dealer Program Matrix', header=3, skiprows=[4])
+                df_report = df_report.iloc[1:].reset_index(drop=True)
                 df_mapping = pd.read_excel(file_mapping)
                 
-                
-                # Merge file_mapping into file_pivot on the 'Product' column
                 df_pivot = pd.merge(df_pivot, df_mapping, on='Product', how='left')
                 df_report = pd.merge(df_report, df_mapping, on='Product', how='left')
+
                 merged_file = "merged_pivot.xlsx"
                 with pd.ExcelWriter(merged_file) as writer:
                     df_pivot.to_excel(writer, sheet_name="Product & Pricing Pivot Data", index=False)
@@ -561,95 +542,76 @@ def dcr_report():
                 df_opt.to_csv(opt_filename, index=False)
                 df_matrix.to_csv(matrix_filename, index=False)
 
-            file_key = f"{country.lower()}_pivot.xlsx"
-            file_key2 = f"{country.lower()}_report.xlsx"
-            progress_bar = st.progress(0)
-            # Dynamically set keys based on the selected country
-            pivot_key = f"{folder_path}pivot.xlsx"
-            report_key = f"{folder_path}report.xlsx"
-            output_key = f"{folder_path}merged.xlsx"
-           
-            with st.spinner('Uploading files to S3...'):
-                with open(merged_file, "rb") as f:
-                    upload_file_to_s3(f, bucket_name, file_key, aws_access_key, aws_secret_key)
-                progress_bar.progress(50)
-                with open(merged_file2, "rb") as f:
-                    upload_file_to_s3(f, bucket_name, file_key2, aws_access_key, aws_secret_key)
-                #upload_file_to_s3(file_pivot.getvalue(), bucket_name, pivot_key, aws_access_key, aws_secret_key)
-                progress_bar.progress(100)
-            
-                # Upload CSV files to S3 with dynamic names
-                with open(con_filename, "rb") as f:
-                    upload_file_to_s3(f, bucket_name, con_filename, aws_access_key2, aws_secret_key2)
-                with open(opt_filename, "rb") as f:
-                    upload_file_to_s3(f, bucket_name, opt_filename, aws_access_key2, aws_secret_key2)
-                with open(matrix_filename, "rb") as f:
-                    upload_file_to_s3(f, bucket_name, matrix_filename, aws_access_key2, aws_secret_key2)
-            log_update(st.session_state['username'], f"{country} DCR")
-            st.success("✅**Files Uploaded to S3!**")
-            
-            # Call Lambda without spinner
-            response = call_lambda_merge_dcr(
-                bucket_name,
-                pivot_key,
-                report_key,
-                bucket_name,
-                output_key,
-                aws_access_key,  # Pass credentials
-                aws_secret_key
-            )
+                file_key = f"{folder_path}pivot.xlsx"
+                file_key2 = f"{folder_path}report.xlsx"
+                progress_bar = st.progress(0)
 
+                with st.spinner('Uploading files to S3...'):
+                    with open(merged_file, "rb") as f:
+                        upload_file_to_s3(f.read(), bucket_name, file_key, aws_access_key, aws_secret_key)
+                    progress_bar.progress(50)
+                    with open(merged_file2, "rb") as f:
+                        upload_file_to_s3(f.read(), bucket_name, file_key2, aws_access_key, aws_secret_key)
+                    progress_bar.progress(100)
+
+                    with open(con_filename, "rb") as f:
+                        upload_file_to_s3(f.read(), bucket_name, con_filename, aws_access_key2, aws_secret_key2)
+                    with open(opt_filename, "rb") as f:
+                        upload_file_to_s3(f.read(), bucket_name, opt_filename, aws_access_key2, aws_secret_key2)
+                    with open(matrix_filename, "rb") as f:
+                        upload_file_to_s3(f.read(), bucket_name, matrix_filename, aws_access_key2, aws_secret_key2)
+                
+                log_update(st.session_state['username'], f"{country} DCR")
+                st.success("✅**Files Uploaded to S3!**")
+
+                response = call_lambda_merge_dcr(
+                    bucket_name,
+                    file_key,
+                    file_key2,
+                    bucket_name,
+                    f"{folder_path}merged.xlsx",
+                    aws_access_key,
+                    aws_secret_key
+                )
+        
         else:
-            # Determine which file is pivot and which is report based on a condition in their names
             file_report = file3 if "MFP_Copier_Report" in file3.name or "EU MFP" in file3.name else file2
             file_pivot = file3 if file_report != file3 else file2
             file_mapping = file4 if "Mapping" in file4.name else None
 
-            # Ensure all necessary files are mapped
             if not file_mapping:
                 st.error("UID Mapping File is not correctly uploaded or named.")
             else:
-                # Load the data from the uploaded files
-                try:
-                    df_pivot = pd.read_excel(file_pivot, sheet_name="Product & Pricing Pivot Data", header=3)
-                except:
-                    df_pivot = pd.read_excel(file_pivot, sheet_name="Pivot Table Data", header=3)
-
+                df_pivot = pd.read_excel(file_pivot, sheet_name="Product & Pricing Pivot Data", header=3) if "Product & Pricing Pivot Data" in pd.ExcelFile(file_pivot).sheet_names else pd.read_excel(file_pivot, sheet_name="Pivot Table Data", header=3)
                 df_mapping = pd.read_excel(file_mapping)
                 
-                #st.write(df_pivot)
-                # Merge file_mapping into file_pivot on the 'Product' column
                 df_pivot = pd.merge(df_pivot, df_mapping, on='Product', how='left')
 
                 merged_file = "merged_pivot.xlsx"
                 with pd.ExcelWriter(merged_file) as writer:
                     df_pivot.to_excel(writer, sheet_name="Pivot Table Data", index=False)
 
-            file_key = f"{country.lower()}_pivot.xlsx"
-            progress_bar = st.progress(0)
-            # Dynamically set keys based on the selected country
-            pivot_key = f"{country.lower()}_pivot.xlsx"
-            report_key = f"{country.lower()}_report.xlsx"
-            output_key = f"{country.lower()}_merged.xlsx"
-           
-            with st.spinner('Uploading files to S3...'):
-                with open(merged_file, "rb") as f:
-                    upload_file_to_s3(f, bucket_name, file_key, aws_access_key, aws_secret_key)
-                #upload_file_to_s3(file_pivot.getvalue(), bucket_name, pivot_key, aws_access_key, aws_secret_key)
-                progress_bar.progress(50)
-                upload_file_to_s3(file_report.getvalue(), bucket_name, report_key, aws_access_key, aws_secret_key)
-                progress_bar.progress(100)
-            st.success("✅**Files Uploaded to S3!**")
-            # Call Lambda without spinner
-            response = call_lambda_merge_dcr(
-                bucket_name,
-                pivot_key,
-                report_key,
-                bucket_name,
-                output_key,
-                aws_access_key,  # Pass credentials
-                aws_secret_key
-            )
+                file_key = f"{folder_path}pivot.xlsx" if folder_path else "pivot.xlsx"
+                progress_bar = st.progress(0)
+                
+                with st.spinner('Uploading files to S3...'):
+                    with open(merged_file, "rb") as f:
+                        upload_file_to_s3(f.read(), bucket_name, file_key, aws_access_key, aws_secret_key)
+                    progress_bar.progress(50)
+                    upload_file_to_s3(file_report.getvalue(), bucket_name, f"{folder_path}report.xlsx" if folder_path else "report.xlsx", aws_access_key, aws_secret_key)
+                    progress_bar.progress(100)
+                
+                st.success("✅**Files Uploaded to S3!**")
+
+                response = call_lambda_merge_dcr(
+                    bucket_name,
+                    file_key,
+                    f"{folder_path}report.xlsx" if folder_path else "report.xlsx",
+                    bucket_name,
+                    f"{folder_path}merged.xlsx" if folder_path else "merged.xlsx",
+                    aws_access_key,
+                    aws_secret_key
+                )
         
 def display_dashboard():
     st.header("Update Copiers Quicksight Data 🔄")
