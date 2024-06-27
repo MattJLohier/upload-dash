@@ -498,11 +498,17 @@ def dcr_report():
                 df_opt.to_csv(f"{country.lower()}_options_pricing.csv", index=False)
                 df_con.to_csv(f"{country.lower()}_consumables_database.csv", index=False)
 
+                progress = 0
+                progress_bar = st.progress(progress)
+
                 with st.spinner('Uploading modified files to S3...'):
                     for csv_file in [f"{country.lower()}_processed.csv", f"{country.lower()}_options_pricing.csv", f"{country.lower()}_consumables_database.csv"]:
                         file_key = f"{folder_path}{csv_file}" if folder_path else csv_file
                         with open(csv_file, "rb") as f:
                             upload_file_to_s3(f.read(), bucket_name, file_key, aws_access_key2, aws_secret_key2)
+                        progress += 33
+                        progress_bar.progress(progress / 100.0)
+                        progress_bar.progress(progress, text=f"Uploading {csv_file}...")
 
                 log_update(st.session_state['username'], f"{country} DCR")
                 st.success(f"✅**Files Uploaded to S3!**")
@@ -546,14 +552,26 @@ def dcr_report():
                 file_key2 = f"{folder_path}report.xlsx"
                 progress_bar = st.progress(0)
 
-                with st.spinner('Uploading modified files to S3...'):
-                    for csv_file in [f"{country.lower()}_processed.csv", f"{country.lower()}_options_pricing.csv", f"{country.lower()}_consumables_database.csv"]:
-                        file_key = f"{folder_path}{csv_file}" if folder_path else csv_file
-                        with open(csv_file, "rb") as f:
-                            upload_file_to_s3(f.read(), bucket_name, file_key, aws_access_key2, aws_secret_key2)
-                        progress += 33
-                        progress_bar.progress(progress / 100.0)
-                        progress_bar.progress(progress, text=f"Uploading {csv_file}...")
+                with st.spinner('Uploading files to S3...'):
+                    with open(merged_file, "rb") as f:
+                        upload_file_to_s3(f.read(), bucket_name, file_key, aws_access_key, aws_secret_key)
+                    progress_bar.progress(0.25, text="Uploaded merged pivot file")
+                    with open(merged_file2, "rb") as f:
+                        upload_file_to_s3(f.read(), bucket_name, file_key2, aws_access_key, aws_secret_key)
+                    progress_bar.progress(0.50, text="Uploaded merged report file")
+
+                    with open(con_filename, "rb") as f:
+                        upload_file_to_s3(f.read(), bucket_name, f"{folder_path}{con_filename}" if folder_path else con_filename, aws_access_key2, aws_secret_key2)
+                    progress_bar.progress(0.75, text="Uploaded consumables file")
+                    with open(opt_filename, "rb") as f:
+                        upload_file_to_s3(f.read(), bucket_name, f"{folder_path}{opt_filename}" if folder_path else opt_filename, aws_access_key2, aws_secret_key2)
+                    progress_bar.progress(0.90, text="Uploaded options pricing file")
+                    with open(matrix_filename, "rb") as f:
+                        upload_file_to_s3(f.read(), bucket_name, f"{folder_path}{matrix_filename}" if folder_path else matrix_filename, aws_access_key2, aws_secret_key2)
+                    progress_bar.progress(1.0, text="Uploaded matrix file")
+                
+                log_update(st.session_state['username'], f"{country} DCR")
+                st.success("✅**Files Uploaded to S3!**")
 
                 log_update(st.session_state['username'], f"{country} DCR")
                 st.success(f"✅**Files Uploaded to S3!**")
