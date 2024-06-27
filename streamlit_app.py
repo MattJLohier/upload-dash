@@ -482,7 +482,6 @@ def dcr_report():
 
         with st.spinner("Preparing data files..."):
             st.write("Preparing data files...")
-
             if country in ["AUS", "MX", "BR"]:
                 if file1:
                     df, df_opt, df_con = None, None, None
@@ -500,11 +499,19 @@ def dcr_report():
                         df_con = pd.read_excel(file1, sheet_name='Consumables Database', header=5, skiprows=[6])
                         df = df.drop(df.index[0])
 
-                    df.to_csv(f"{country.lower()}_processed.csv", index=False)
-                    df_opt.to_csv(f"{country.lower()}_options_pricing.csv", index=False)
-                    df_con.to_csv(f"{country.lower()}_consumables_database.csv", index=False)
+                    progress = 10
+                    progress_bar.progress(progress / 100.0)
 
+                    df.to_csv(f"{country.lower()}_processed.csv", index=False)
                     progress = 20
+                    progress_bar.progress(progress / 100.0)
+
+                    df_opt.to_csv(f"{country.lower()}_options_pricing.csv", index=False)
+                    progress = 30
+                    progress_bar.progress(progress / 100.0)
+
+                    df_con.to_csv(f"{country.lower()}_consumables_database.csv", index=False)
+                    progress = 40
                     progress_bar.progress(progress / 100.0)
 
             elif country == "US":
@@ -516,23 +523,49 @@ def dcr_report():
                     st.error("UID Mapping File is not correctly uploaded or named.")
                 else:
                     df_pivot = pd.read_excel(file_pivot, sheet_name="Product & Pricing Pivot Data", header=3)
+                    progress = 10
+                    progress_bar.progress(progress / 100.0)
+
                     df_report = pd.read_excel(file_report, sheet_name="Product Details", header=5)
+                    progress = 20
+                    progress_bar.progress(progress / 100.0)
+
                     df_opt = pd.read_excel(file_pivot, sheet_name='Options Pricing', header=4, skiprows=[5])
+                    progress = 30
+                    progress_bar.progress(progress / 100.0)
+
                     df_con = pd.read_excel(file_pivot, sheet_name='Consumables Database', header=3, skiprows=[4])
+                    progress = 40
+                    progress_bar.progress(progress / 100.0)
+
                     df_matrix = pd.read_excel(file_pivot, sheet_name='Dealer Program Matrix', header=3, skiprows=[4])
+                    progress = 50
+                    progress_bar.progress(progress / 100.0)
+
                     df_report = df_report.iloc[1:].reset_index(drop=True)
                     df_mapping = pd.read_excel(file_mapping)
+                    progress = 60
+                    progress_bar.progress(progress / 100.0)
 
                     df_pivot = pd.merge(df_pivot, df_mapping, on='Product', how='left')
+                    progress = 70
+                    progress_bar.progress(progress / 100.0)
+
                     df_report = pd.merge(df_report, df_mapping, on='Product', how='left')
+                    progress = 80
+                    progress_bar.progress(progress / 100.0)
 
                     merged_file = "merged_pivot.xlsx"
                     with pd.ExcelWriter(merged_file) as writer:
                         df_pivot.to_excel(writer, sheet_name="Product & Pricing Pivot Data", index=False)
+                    progress = 90
+                    progress_bar.progress(progress / 100.0)
 
                     merged_file2 = "merged_report.xlsx"
                     with pd.ExcelWriter(merged_file2) as writer:
                         df_report.to_excel(writer, sheet_name="Product Details", index=False)
+                    progress = 100
+                    progress_bar.progress(progress / 100.0)
 
                     con_filename = f"{country.lower()}_con.csv"
                     opt_filename = f"{country.lower()}_opt.csv"
@@ -544,9 +577,6 @@ def dcr_report():
 
                     file_key = f"{folder_path}pivot.xlsx"
                     file_key2 = f"{folder_path}report.xlsx"
-                    progress = 20
-                    progress_bar.progress(progress / 100.0)
-
             else:
                 file_report = file3 if "MFP_Copier_Report" in file3.name or "EU MFP" in file3.name else file2
                 file_pivot = file3 if file_report != file3 else file2
@@ -557,16 +587,20 @@ def dcr_report():
                 else:
                     df_pivot = pd.read_excel(file_pivot, sheet_name="Product & Pricing Pivot Data", header=3) if "Product & Pricing Pivot Data" in pd.ExcelFile(file_pivot).sheet_names else pd.read_excel(file_pivot, sheet_name="Pivot Table Data", header=3)
                     df_mapping = pd.read_excel(file_mapping)
+                    progress = 10
+                    progress_bar.progress(progress / 100.0)
 
                     df_pivot = pd.merge(df_pivot, df_mapping, on='Product', how='left')
+                    progress = 20
+                    progress_bar.progress(progress / 100.0)
 
                     merged_file = "merged_pivot.xlsx"
                     with pd.ExcelWriter(merged_file) as writer:
                         df_pivot.to_excel(writer, sheet_name="Pivot Table Data", index=False)
+                    progress = 30
+                    progress_bar.progress(progress / 100.0)
 
                     file_key = f"{folder_path}pivot.xlsx" if folder_path else "pivot.xlsx"
-                    progress = 20
-                    progress_bar.progress(progress / 100.0)
 
         with st.spinner('Uploading files to S3...'):
             if country in ["AUS", "MX", "BR"]:
