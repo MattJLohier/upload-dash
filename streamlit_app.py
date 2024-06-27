@@ -603,7 +603,7 @@ def dcr_report():
                     progress_bar.progress(progress / 100)
 
                     log_update(st.session_state['username'], f"{country} DCR")
-                    st.success("✅**Files Uploaded to S3!**")
+                st.success("✅**Files Uploaded to S3!**")
 
                 response = call_lambda_merge_dcr(
                     bucket_name,
