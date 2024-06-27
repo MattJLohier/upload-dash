@@ -481,75 +481,28 @@ def dcr_report():
         progress_bar = st.progress(progress)
 
         st.write("Preparing data files...")
-        progress = 0
-        progress_bar = st.progress(progress)
-        
         if country in ["AUS", "MX", "BR"]:
             if file1:
                 df, df_opt, df_con = None, None, None
-                
-                st.write("Reading data files...")
                 if country == "AUS":
-                    st.write("Reading data for Australia...")
                     df = pd.read_excel(file1, sheet_name='Pivot Table Data', header=3)
-                    progress += 10
-                    progress_bar.progress(progress / 100.0)
-                    
-                    st.write("Reading options pricing for Australia...")
                     df_opt = pd.read_excel(file1, sheet_name='Options Pricing', header=5, skiprows=[6])
-                    progress += 10
-                    progress_bar.progress(progress / 100.0)
-                    
-                    st.write("Reading consumables database for Australia...")
                     df_con = pd.read_excel(file1, sheet_name='Consumables Database', header=5, skiprows=[6])
-                    progress += 10
-                    progress_bar.progress(progress / 100.0)
-                
                 elif country == "MX":
-                    st.write("Reading data for Mexico...")
                     df = pd.read_excel(file1, sheet_name='Product & Pricing Pivot Data', header=3)
-                    progress += 10
-                    progress_bar.progress(progress / 100.0)
-                    
-                    st.write("Reading options pricing for Mexico...")
                     df_opt = pd.read_excel(file1, sheet_name='Options Pricing', header=5, skiprows=[6])
-                    progress += 10
-                    progress_bar.progress(progress / 100.0)
-                    
-                    st.write("Reading consumables database for Mexico...")
                     df_con = pd.read_excel(file1, sheet_name='Consumables Database', header=5, skiprows=[6])
-                    progress += 10
-                    progress_bar.progress(progress / 100.0)
-                
                 elif country == "BR":
-                    st.write("Reading data for Brazil...")
                     df = pd.read_excel(file1, sheet_name='Hardware Pricing', header=7, skiprows=[8])
-                    progress += 10
-                    progress_bar.progress(progress / 100.0)
-                    
-                    st.write("Reading options pricing for Brazil...")
                     df_opt = pd.read_excel(file1, sheet_name='Options Pricing', header=5, skiprows=[6])
-                    progress += 10
-                    progress_bar.progress(progress / 100.0)
-                    
-                    st.write("Reading consumables database for Brazil...")
                     df_con = pd.read_excel(file1, sheet_name='Consumables Database', header=5, skiprows=[6])
-                    progress += 10
-                    progress_bar.progress(progress / 100.0)
-                    
                     df = df.drop(df.index[0])
 
-                st.write("Saving processed data files...")
                 df.to_csv(f"{country.lower()}_processed.csv", index=False)
-                progress += 10
-                progress_bar.progress(progress / 100.0)
-                
                 df_opt.to_csv(f"{country.lower()}_options_pricing.csv", index=False)
-                progress += 10
-                progress_bar.progress(progress / 100.0)
-                
                 df_con.to_csv(f"{country.lower()}_consumables_database.csv", index=False)
-                progress += 10
+
+                progress = 10
                 progress_bar.progress(progress / 100.0)
 
                 st.write('Uploading modified files to S3...')
