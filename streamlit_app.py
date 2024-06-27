@@ -480,11 +480,9 @@ def dcr_report():
         progress = 0
         progress_bar = st.progress(progress)
 
-        spinner_container = st.empty()
-
-        with spinner_container.spinner('Uploading...'):
-            if country in ["AUS", "MX", "BR"]:
-                if file1:
+        if country in ["AUS", "MX", "BR"]:
+            if file1:
+                with st.spinner('Uploading...'):
                     df, df_opt, df_con = None, None, None
                     st.write("Reading Excel sheets...")
                     if country == "AUS":
@@ -522,16 +520,15 @@ def dcr_report():
                         progress_bar.progress(progress / 100)
 
                     log_update(st.session_state['username'], f"{country} DCR")
-                    spinner_container.empty()
                     st.success(f"✅**Files Uploaded to S3!**")
 
-            elif country == "US":
+        elif country == "US":
+            with st.spinner('Uploading...'):
                 file_report = file3 if "MFP_Copier_Report" in file3.name else file2
                 file_pivot = file3 if file_report != file3 else file2
                 file_mapping = file4 if "Mapping" in file4.name else None
 
                 if not file_mapping:
-                    spinner_container.empty()
                     st.error("UID Mapping File is not correctly uploaded or named.")
                 else:
                     st.write("Reading Excel sheets...")
@@ -606,7 +603,6 @@ def dcr_report():
                     progress_bar.progress(progress / 100)
 
                     log_update(st.session_state['username'], f"{country} DCR")
-                    spinner_container.empty()
                     st.success("✅**Files Uploaded to S3!**")
 
                     response = call_lambda_merge_dcr(
@@ -618,14 +614,13 @@ def dcr_report():
                         aws_access_key,
                         aws_secret_key
                     )
-
-            else:
+        else:
+            with st.spinner('Uploading...'):
                 file_report = file3 if "MFP_Copier_Report" in file3.name or "EU MFP" in file3.name else file2
                 file_pivot = file3 if file_report != file3 else file2
                 file_mapping = file4 if "Mapping" in file4.name else None
 
                 if not file_mapping:
-                    spinner_container.empty()
                     st.error("UID Mapping File is not correctly uploaded or named.")
                 else:
                     st.write("Reading Excel sheets...")
@@ -656,7 +651,6 @@ def dcr_report():
                     progress += 40
                     progress_bar.progress(progress / 100)
 
-                    spinner_container.empty()
                     st.success("✅**Files Uploaded to S3!**")
 
                     response = call_lambda_merge_dcr(
