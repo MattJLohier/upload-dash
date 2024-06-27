@@ -217,7 +217,7 @@ def display_log(s3_bucket, aws_access_key, aws_secret_key):
         aws_secret_access_key=aws_secret_key
     )
     
-    log_file = "update_log.json"
+    log_file = "logs/update_log.json"
     
     # Fetch log from S3
     try:
