@@ -500,7 +500,7 @@ def dcr_report():
                     df_con = pd.read_excel(file1, sheet_name='Consumables Database', header=5, skiprows=[6])
                     df = df.drop(df.index[0])
                 
-                progress += 10
+                progress += 20
                 progress_bar.progress(progress / 100)
 
                 st.write("Saving data to CSV files...")
@@ -508,7 +508,7 @@ def dcr_report():
                 df_opt.to_csv(f"{country.lower()}_options_pricing.csv", index=False)
                 df_con.to_csv(f"{country.lower()}_consumables_database.csv", index=False)
 
-                progress += 10
+                progress += 20
                 progress_bar.progress(progress / 100)
 
                 st.write('Uploading modified files to S3...')
