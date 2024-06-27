@@ -477,16 +477,10 @@ def dcr_report():
 
         folder_path = f"{country.lower()}/" if country in ["AUS", "MX", "BR", "US", "CA", "DE", "ES", "FR", "IT", "UK"] else None
 
-        total_steps = 10
         progress = 0
         progress_bar = st.progress(progress)
 
-        def update_progress(step):
-            nonlocal progress
-            progress += step
-            progress_bar.progress(progress / total_steps)
-
-        with st.spinner('Preparing data files...'):
+        with st.spinner('Uploading...'):
             if country in ["AUS", "MX", "BR"]:
                 if file1:
                     df, df_opt, df_con = None, None, None
@@ -505,14 +499,16 @@ def dcr_report():
                         df_con = pd.read_excel(file1, sheet_name='Consumables Database', header=5, skiprows=[6])
                         df = df.drop(df.index[0])
                     
-                    update_progress(1)
+                    progress += 10
+                    progress_bar.progress(progress / 100)
 
                     st.write("Saving data to CSV files...")
                     df.to_csv(f"{country.lower()}_processed.csv", index=False)
                     df_opt.to_csv(f"{country.lower()}_options_pricing.csv", index=False)
                     df_con.to_csv(f"{country.lower()}_consumables_database.csv", index=False)
 
-                    update_progress(1)
+                    progress += 10
+                    progress_bar.progress(progress / 100)
 
                     st.write('Uploading modified files to S3...')
                     for csv_file in [f"{country.lower()}_processed.csv", f"{country.lower()}_options_pricing.csv", f"{country.lower()}_consumables_database.csv"]:
@@ -520,7 +516,8 @@ def dcr_report():
                         file_key = f"{folder_path}{csv_file}" if folder_path else csv_file
                         with open(csv_file, "rb") as f:
                             upload_file_to_s3(f.read(), bucket_name, file_key, aws_access_key2, aws_secret_key2)
-                        update_progress(2)
+                        progress += 20
+                        progress_bar.progress(progress / 100)
 
                     log_update(st.session_state['username'], f"{country} DCR")
                     st.success(f"✅**Files Uploaded to S3!**")
@@ -546,7 +543,8 @@ def dcr_report():
                     df_pivot = pd.merge(df_pivot, df_mapping, on='Product', how='left')
                     df_report = pd.merge(df_report, df_mapping, on='Product', how='left')
 
-                    update_progress(1)
+                    progress += 10
+                    progress_bar.progress(progress / 100)
 
                     st.write("Saving merged data to Excel files...")
                     merged_file = "merged_pivot.xlsx"
@@ -557,7 +555,8 @@ def dcr_report():
                     with pd.ExcelWriter(merged_file2) as writer:
                         df_report.to_excel(writer, sheet_name="Product Details", index=False)
 
-                    update_progress(1)
+                    progress += 10
+                    progress_bar.progress(progress / 100)
 
                     st.write("Saving additional data to CSV files...")
                     con_filename = f"{country.lower()}_con.csv"
@@ -575,24 +574,29 @@ def dcr_report():
                     with open(merged_file, "rb") as f:
                         st.write("Uploading merged pivot file...")
                         upload_file_to_s3(f.read(), bucket_name, file_key, aws_access_key, aws_secret_key)
-                    update_progress(2)
+                    progress += 10
+                    progress_bar.progress(progress / 100)
                     with open(merged_file2, "rb") as f:
                         st.write("Uploading merged report file...")
                         upload_file_to_s3(f.read(), bucket_name, file_key2, aws_access_key, aws_secret_key)
-                    update_progress(2)
+                    progress += 10
+                    progress_bar.progress(progress / 100)
 
                     with open(con_filename, "rb") as f:
                         st.write("Uploading consumables file...")
                         upload_file_to_s3(f.read(), bucket_name, f"{folder_path}{con_filename}" if folder_path else con_filename, aws_access_key2, aws_secret_key2)
-                    update_progress(1)
+                    progress += 10
+                    progress_bar.progress(progress / 100)
                     with open(opt_filename, "rb") as f:
                         st.write("Uploading options pricing file...")
                         upload_file_to_s3(f.read(), bucket_name, f"{folder_path}{opt_filename}" if folder_path else opt_filename, aws_access_key2, aws_secret_key2)
-                    update_progress(1)
+                    progress += 10
+                    progress_bar.progress(progress / 100)
                     with open(matrix_filename, "rb") as f:
                         st.write("Uploading matrix file...")
                         upload_file_to_s3(f.read(), bucket_name, f"{folder_path}{matrix_filename}" if folder_path else matrix_filename, aws_access_key2, aws_secret_key2)
-                    update_progress(1)
+                    progress += 10
+                    progress_bar.progress(progress / 100)
 
                     log_update(st.session_state['username'], f"{country} DCR")
                     st.success("✅**Files Uploaded to S3!**")
@@ -622,7 +626,8 @@ def dcr_report():
                     st.write("Merging data frames...")
                     df_pivot = pd.merge(df_pivot, df_mapping, on='Product', how='left')
 
-                    update_progress(1)
+                    progress += 10
+                    progress_bar.progress(progress / 100)
 
                     st.write("Saving merged data to Excel files...")
                     merged_file = "merged_pivot.xlsx"
@@ -635,10 +640,12 @@ def dcr_report():
                     with open(merged_file, "rb") as f:
                         st.write("Uploading merged pivot file...")
                         upload_file_to_s3(f.read(), bucket_name, file_key, aws_access_key, aws_secret_key)
-                    update_progress(5)
+                    progress += 50
+                    progress_bar.progress(progress / 100)
                     st.write("Uploading report file...")
                     upload_file_to_s3(file_report.getvalue(), bucket_name, f"{folder_path}report.xlsx" if folder_path else "report.xlsx", aws_access_key, aws_secret_key)
-                    update_progress(4)
+                    progress += 40
+                    progress_bar.progress(progress / 100)
 
                     st.success("✅**Files Uploaded to S3!**")
 
