@@ -605,15 +605,15 @@ def dcr_report():
                     log_update(st.session_state['username'], f"{country} DCR")
                     st.success("✅**Files Uploaded to S3!**")
 
-                    response = call_lambda_merge_dcr(
-                        bucket_name,
-                        file_key,
-                        file_key2,
-                        bucket_name,
-                        f"{folder_path}merged.xlsx",
-                        aws_access_key,
-                        aws_secret_key
-                    )
+                response = call_lambda_merge_dcr(
+                    bucket_name,
+                    file_key,
+                    file_key2,
+                    bucket_name,
+                    f"{folder_path}merged.xlsx",
+                    aws_access_key,
+                    aws_secret_key
+                )
         else:
             with st.spinner('Uploading...'):
                 file_report = file3 if "MFP_Copier_Report" in file3.name or "EU MFP" in file3.name else file2
