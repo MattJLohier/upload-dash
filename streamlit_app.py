@@ -479,8 +479,11 @@ def dcr_report():
 
         folder_path = f"{country.lower()}/" if country in ["AUS", "MX", "BR", "US", "CA", "DE", "ES", "FR", "IT", "UK"] else None
 
-        st.write("Preparing data files...")
+        progress = 0
+        progress_bar = st.progress(progress)
         
+        st.write("Preparing data files...")
+
         if country in ["AUS", "MX", "BR"]:
             if file1:
                 df, df_opt, df_con = None, None, None
@@ -502,8 +505,8 @@ def dcr_report():
                 df_opt.to_csv(f"{country.lower()}_options_pricing.csv", index=False)
                 df_con.to_csv(f"{country.lower()}_consumables_database.csv", index=False)
 
-                progress = 0
-                progress_bar = st.progress(progress)
+                progress = 10
+                progress_bar.progress(progress / 100.0)
 
                 st.spinner('Uploading modified files to S3...')
                 for csv_file in [f"{country.lower()}_processed.csv", f"{country.lower()}_options_pricing.csv", f"{country.lower()}_consumables_database.csv"]:
@@ -511,7 +514,7 @@ def dcr_report():
                     file_key = f"{folder_path}{csv_file}" if folder_path else csv_file
                     with open(csv_file, "rb") as f:
                         upload_file_to_s3(f.read(), bucket_name, file_key, aws_access_key2, aws_secret_key2)
-                    progress += 33
+                    progress += 30
                     progress_bar.progress(progress / 100.0)
 
                 log_update(st.session_state['username'], f"{country} DCR")
