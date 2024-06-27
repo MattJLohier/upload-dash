@@ -437,14 +437,13 @@ def pp_report():
         progress_bar2.progress(40)
 
         # Upload files with progress bar
-        with st.spinner('Uploading files to S3...'):
-            st.write("Uploading 1/2")
-            upload_file_to_s3(file_pivot.getvalue(), bucket_name, pivot_key, aws_access_key, aws_secret_key)
-            progress_bar2.progress(75)  # Update progress bar to 50%
+        st.write("Uploading 1/2")
+        upload_file_to_s3(file_pivot.getvalue(), bucket_name, pivot_key, aws_access_key, aws_secret_key)
+        progress_bar2.progress(75)  # Update progress bar to 50%
 
-            st.write("Uploading 2/2")
-            upload_file_to_s3(file_report.getvalue(), bucket_name, report_key, aws_access_key, aws_secret_key)
-            progress_bar2.progress(100)  # Update progress bar to 100%
+        st.write("Uploading 2/2")
+        upload_file_to_s3(file_report.getvalue(), bucket_name, report_key, aws_access_key, aws_secret_key)
+        progress_bar2.progress(100)  # Update progress bar to 100%
 
         log_update(st.session_state['username'], "US P&P")
         st.success("✅**Files Uploaded to S3!**")
