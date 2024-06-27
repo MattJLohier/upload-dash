@@ -634,6 +634,8 @@ def dcr_report():
                 st.error("UID Mapping File is not correctly uploaded or named.")
             else:
                 st.write("Reading Excel sheets...")
+                progress += 10
+                progress_bar.progress(progress / 100)
                 df_pivot = pd.read_excel(file_pivot, sheet_name="Product & Pricing Pivot Data", header=3) if "Product & Pricing Pivot Data" in pd.ExcelFile(file_pivot).sheet_names else pd.read_excel(file_pivot, sheet_name="Pivot Table Data", header=3)
                 df_mapping = pd.read_excel(file_mapping)
 
@@ -644,6 +646,8 @@ def dcr_report():
                 progress_bar.progress(progress / 100)
 
                 st.write("Saving merged data to Excel files...")
+                progress += 10
+                progress_bar.progress(progress / 100)
                 merged_file = "merged_pivot.xlsx"
                 with pd.ExcelWriter(merged_file) as writer:
                     df_pivot.to_excel(writer, sheet_name="Pivot Table Data", index=False)
@@ -654,11 +658,11 @@ def dcr_report():
                 with open(merged_file, "rb") as f:
                     st.write("Uploading merged pivot file...")
                     upload_file_to_s3(f.read(), bucket_name, file_key, aws_access_key, aws_secret_key)
-                progress += 50
+                progress += 20
                 progress_bar.progress(progress / 100)
                 st.write("Uploading report file...")
                 upload_file_to_s3(file_report.getvalue(), bucket_name, f"{folder_path}report.xlsx" if folder_path else "report.xlsx", aws_access_key, aws_secret_key)
-                progress += 40
+                progress += 50
                 progress_bar.progress(progress / 100)
 
                 st.success("✅**Files Uploaded to S3!**")
