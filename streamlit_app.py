@@ -555,11 +555,11 @@ def dcr_report():
                     progress_bar.progress(100)
 
                     with open(con_filename, "rb") as f:
-                        upload_file_to_s3(f.read(), bucket_name, con_filename, aws_access_key2, aws_secret_key2)
+                        upload_file_to_s3(f.read(), bucket_name, f"{folder_path}{con_filename}" if folder_path else con_filename, aws_access_key2, aws_secret_key2)
                     with open(opt_filename, "rb") as f:
-                        upload_file_to_s3(f.read(), bucket_name, opt_filename, aws_access_key2, aws_secret_key2)
+                        upload_file_to_s3(f.read(), bucket_name, f"{folder_path}{opt_filename}" if folder_path else opt_filename, aws_access_key2, aws_secret_key2)
                     with open(matrix_filename, "rb") as f:
-                        upload_file_to_s3(f.read(), bucket_name, matrix_filename, aws_access_key2, aws_secret_key2)
+                        upload_file_to_s3(f.read(), bucket_name, f"{folder_path}{matrix_filename}" if folder_path else matrix_filename, aws_access_key2, aws_secret_key2)
                 
                 log_update(st.session_state['username'], f"{country} DCR")
                 st.success("✅**Files Uploaded to S3!**")
