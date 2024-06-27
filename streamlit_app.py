@@ -437,6 +437,7 @@ def pp_report():
 
         log_update(st.session_state['username'], "US P&P")
         st.success("✅**Files Uploaded to S3!**")
+        st.toast('Files Saved!', icon='✅')
 
         # Call Lambda without spinner
         response = call_lambda_merge(
@@ -660,6 +661,7 @@ def dcr_report():
                 progress_bar.progress(progress / 100)
 
                 st.success("✅**Files Uploaded to S3!**")
+                st.toast('Files Saved!', icon='✅')
 
                 response = call_lambda_merge_dcr(
                     bucket_name,
