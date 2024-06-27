@@ -578,7 +578,6 @@ def dcr_report():
                     progress += 20
                     progress_bar.progress(progress / 100.0)
                 log_update(st.session_state['username'], f"{country} DCR")
-                st.success(f"✅**Files Uploaded to S3!**")
 
             elif country == "US":
                 with open(merged_file, "rb") as f:
@@ -609,8 +608,6 @@ def dcr_report():
                 progress_bar.progress(progress / 100.0)
 
                 log_update(st.session_state['username'], f"{country} DCR")
-                st.success("✅**Files Uploaded to S3!**")
-
                 response = call_lambda_merge_dcr(
                     bucket_name,
                     file_key,
@@ -622,7 +619,7 @@ def dcr_report():
                 )
 
             else:
-                with open(merged_file, "rb") as f:
+                with open(erged_file, "rb") as f:
                     st.write("Uploading merged pivot file...")
                     upload_file_to_s3(f.read(), bucket_name, file_key, aws_access_key, aws_secret_key)
                 progress += 50
@@ -632,17 +629,17 @@ def dcr_report():
                 progress += 50
                 progress_bar.progress(progress / 100.0)
 
-                st.success("✅**Files Uploaded to S3!**")
+            st.success("✅**Files Uploaded to S3!**")
 
-                response = call_lambda_merge_dcr(
-                    bucket_name,
-                    file_key,
-                    f"{folder_path}report.xlsx" if folder_path else "report.xlsx",
-                    bucket_name,
-                    f"{folder_path}merged.xlsx" if folder_path else "merged.xlsx",
-                    aws_access_key,
-                    aws_secret_key
-                )
+            response = call_lambda_merge_dcr(
+                bucket_name,
+                file_key,
+                f"{folder_path}report.xlsx" if folder_path else "report.xlsx",
+                bucket_name,
+                f"{folder_path}merged.xlsx" if folder_path else "merged.xlsx",
+                aws_access_key,
+                aws_secret_key
+            )
         
 def display_dashboard():
     st.header("Update Copiers Quicksight Data 🔄")
