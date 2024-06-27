@@ -135,7 +135,7 @@ def get_last_login(username):
         aws_secret_access_key=aws_secret_key
     )
     
-    log_file = "logs/update_log.json"
+    log_file = "logs/login_log.json"
     
     # Fetch existing log from S3
     try:
