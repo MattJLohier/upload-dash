@@ -611,6 +611,7 @@ def dcr_report():
 
                 log_update(st.session_state['username'], f"{country} DCR")
                 st.success("✅**Files Uploaded to S3!**")
+                st.toast('Files Saved!', icon='✅')
 
                 response = call_lambda_merge_dcr(
                     bucket_name,
