@@ -480,7 +480,9 @@ def dcr_report():
         progress = 0
         progress_bar = st.progress(progress)
 
-        with st.spinner('Uploading...'):
+        spinner_container = st.empty()
+
+        with spinner_container.spinner('Uploading...'):
             if country in ["AUS", "MX", "BR"]:
                 if file1:
                     df, df_opt, df_con = None, None, None
@@ -520,6 +522,7 @@ def dcr_report():
                         progress_bar.progress(progress / 100)
 
                     log_update(st.session_state['username'], f"{country} DCR")
+                    spinner_container.empty()
                     st.success(f"✅**Files Uploaded to S3!**")
 
             elif country == "US":
@@ -528,6 +531,7 @@ def dcr_report():
                 file_mapping = file4 if "Mapping" in file4.name else None
 
                 if not file_mapping:
+                    spinner_container.empty()
                     st.error("UID Mapping File is not correctly uploaded or named.")
                 else:
                     st.write("Reading Excel sheets...")
@@ -602,6 +606,7 @@ def dcr_report():
                     progress_bar.progress(progress / 100)
 
                     log_update(st.session_state['username'], f"{country} DCR")
+                    spinner_container.empty()
                     st.success("✅**Files Uploaded to S3!**")
 
                     response = call_lambda_merge_dcr(
@@ -620,6 +625,7 @@ def dcr_report():
                 file_mapping = file4 if "Mapping" in file4.name else None
 
                 if not file_mapping:
+                    spinner_container.empty()
                     st.error("UID Mapping File is not correctly uploaded or named.")
                 else:
                     st.write("Reading Excel sheets...")
@@ -650,6 +656,7 @@ def dcr_report():
                     progress += 40
                     progress_bar.progress(progress / 100)
 
+                    spinner_container.empty()
                     st.success("✅**Files Uploaded to S3!**")
 
                     response = call_lambda_merge_dcr(
