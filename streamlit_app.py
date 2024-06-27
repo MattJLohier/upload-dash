@@ -522,6 +522,7 @@ def dcr_report():
 
                 log_update(st.session_state['username'], f"{country} DCR")
                 st.success(f"✅**Files Uploaded to S3!**")
+                st.toast('Files Saved!', icon='✅')
 
         elif country == "US":
             file_report = file3 if "MFP_Copier_Report" in file3.name else file2
