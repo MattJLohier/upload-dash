@@ -104,7 +104,7 @@ def update_login_log(username):
         aws_secret_access_key=aws_secret_key
     )
     
-    log_file = "login_log.json"
+    log_file = "logs/login_log.json"
     
     # Fetch existing log from S3
     try:
@@ -135,7 +135,7 @@ def get_last_login(username):
         aws_secret_access_key=aws_secret_key
     )
     
-    log_file = "login_log.json"
+    log_file = "logs/update_log.json"
     
     # Fetch existing log from S3
     try:
@@ -187,7 +187,7 @@ def log_update(username, file_name):
         aws_secret_access_key=aws_secret_key2
     )
     
-    log_file = "update_log.json"
+    log_file = "logs/update_log.json"
     username = st.session_state.get('username', 'unknown')
     # Fetch existing log from S3
     try:
@@ -294,7 +294,7 @@ def display_logins_page():
         aws_secret_access_key=aws_secret_key
     )
 
-    log_file = "login_log.json"
+    log_file = "logs/login_log.json"
 
     # Fetch existing log from S3
     try:
