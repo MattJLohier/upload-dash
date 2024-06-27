@@ -555,10 +555,13 @@ def dcr_report():
                     with pd.ExcelWriter(merged_file2) as writer:
                         df_report.to_excel(writer, sheet_name="Product Details", index=False)
 
-                    progress += 10
+                    progress += 20
                     progress_bar.progress(progress / 100)
 
                     st.write("Saving additional data to CSV files...")
+                    progress += 20
+                    progress_bar.progress(progress / 100)
+
                     con_filename = f"{country.lower()}_con.csv"
                     opt_filename = f"{country.lower()}_opt.csv"
                     matrix_filename = f"{country.lower()}_matrix.csv"
