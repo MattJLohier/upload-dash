@@ -566,9 +566,17 @@ def dcr_report():
                 opt_filename = f"{country.lower()}_opt.csv"
                 matrix_filename = f"{country.lower()}_matrix.csv"
 
+                st.write("Setting Filenames...")
+                progress += 10
+                progress_bar.progress(progress / 100)
+
                 df_con.to_csv(con_filename, index=False)
                 df_opt.to_csv(opt_filename, index=False)
                 df_matrix.to_csv(matrix_filename, index=False)
+
+                st.write("Finalizing Dataframes...")
+                progress += 10
+                progress_bar.progress(progress / 100)
 
                 file_key = f"{folder_path}pivot.xlsx"
                 file_key2 = f"{folder_path}report.xlsx"
