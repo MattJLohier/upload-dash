@@ -419,21 +419,29 @@ def pp_report():
         aws_region = st.secrets["aws"]["aws_region"]
         bucket_name = st.secrets["aws"]["bucket_name"]
 
+        st.write("Merging...")
+        progress_bar2 = st.progress(0)
+
         file_pivot = file1 if "PivotTable" in file1.name else file2
         file_report = file1 if file_pivot != file1 else file2
+
+        st.write("Setting Keys...")
+        progress_bar2.progress(20)
+
         pivot_key = "pivot_data.xlsx"
         report_key = "report_data.xlsx"
         output_key = "merged_data.xlsx"
         
-        progress_bar = st.progress(0)
+        st.write("Preparing Files...")
+        progress_bar2.progress(40)
 
         # Upload files with progress bar
         with st.spinner('Uploading files to S3...'):
             upload_file_to_s3(file_pivot.getvalue(), bucket_name, pivot_key, aws_access_key, aws_secret_key)
-            progress_bar.progress(50)  # Update progress bar to 50%
+            progress_bar2.progress(75)  # Update progress bar to 50%
 
             upload_file_to_s3(file_report.getvalue(), bucket_name, report_key, aws_access_key, aws_secret_key)
-            progress_bar.progress(100)  # Update progress bar to 100%
+            progress_bar2.progress(100)  # Update progress bar to 100%
 
         log_update(st.session_state['username'], "US P&P")
         st.success("✅**Files Uploaded to S3!**")
