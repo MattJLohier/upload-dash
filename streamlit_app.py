@@ -376,11 +376,10 @@ def call_lambda_merge(input_bucket, pivot_file_key, report_file_key, output_buck
     }
     response = lambda_client.invoke(
         FunctionName='Consolidator',
-        InvocationType='RequestResponse',
+        InvocationType='Event',
         Payload=json.dumps(payload)
     )
-    response_from_lambda = json.load(response['Payload'])
-    return response_from_lambda
+    return response
 
 
 def call_lambda_merge_dcr(input_bucket, pivot_file_key, report_file_key, output_bucket, output_file_key, aws_access_key, aws_secret_key):
