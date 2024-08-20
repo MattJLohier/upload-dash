@@ -508,7 +508,15 @@ def dcr_report():
                     df_opt = pd.read_excel(file1, sheet_name='Options Pricing', header=5, skiprows=[6])
                     df_con = pd.read_excel(file1, sheet_name='Consumables Database', header=5, skiprows=[6])
                     df = df.drop(df.index[0])
-                
+
+                df.replace("-", pd.NA, inplace=True)
+                df_opt.replace("-", pd.NA, inplace=True)
+                df_con.replace("-", pd.NA, inplace=True)
+
+                df.dropna(inplace=True)
+                df_opt.dropna(inplace=True)
+                df_con.dropna(inplace=True)
+
                 progress += 20
                 progress_bar.progress(progress / 100)
 
