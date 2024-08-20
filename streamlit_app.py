@@ -653,6 +653,10 @@ def dcr_report():
                 df_pivot = pd.read_excel(file_pivot, sheet_name="Product & Pricing Pivot Data", header=3) if "Product & Pricing Pivot Data" in pd.ExcelFile(file_pivot).sheet_names else pd.read_excel(file_pivot, sheet_name="Pivot Table Data", header=3)
                 df_mapping = pd.read_excel(file_mapping)
 
+                df_pivot.replace({"na": "", "-": ""}, inplace=True)
+                df_mapping.replace({"na": "", "-": ""}, inplace=True)
+                df_report.replace({"na": "", "-": ""}, inplace=True)
+
                 st.write("Merging data frames...")
                 df_pivot = pd.merge(df_pivot, df_mapping, on='Product', how='left')
 
